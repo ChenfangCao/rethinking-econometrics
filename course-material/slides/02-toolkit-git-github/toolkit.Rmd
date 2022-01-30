@@ -50,7 +50,7 @@ style_mono_accent(
 ]
 ]
 .pull-right[
-### .pink[Doing data science]
+### .pink[Doing financial data science]
 - .pink[Programming:]
   - .pink[R]
   - .pink[RStudio]
