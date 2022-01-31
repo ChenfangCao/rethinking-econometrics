@@ -25,7 +25,7 @@ But you should clean up some of the narrative so that it only includes what you 
 
 First let's plot the data in the ITV dataset:
 
-```{r plot-dino, fig.height=3, fig.width=6}
+```{r plot-ITV, fig.height=3, fig.width=6}
 ITV<-ftse350 %>% filter(ticker=="ITV") %>% filter(variable=="Market Value")
 
 ggplot(data = ITV, mapping = aes(x =date , y = value)) +
@@ -34,9 +34,11 @@ ggplot(data = ITV, mapping = aes(x =date , y = value)) +
 
 And next calculate the correlation between `x` and `y` in this dataset:
 
-```{r cor-dino}
-ITV %>%
-  summarize(r = cor(lag(value), value))
+```{r cor-ITV}
+ITV %>% 
+  arrange(date) %>%
+  mutate(lgvalue=lag(value)) %>%
+  summarize(r = cor(lgvalue, value,use = "na.or.complete"))
 ```
 
 ### Exercise 3
