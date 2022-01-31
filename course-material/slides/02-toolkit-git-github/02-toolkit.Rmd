@@ -2,10 +2,10 @@
 title: "FIN7030: Times Series Financial Econometrics 2" 
 subtitle: "Meet the toolkit:<br>programming"
 author: "Barry Quinn"
-Date: "`r Sys.Date()`"
+date: "`r Sys.Date()`"
 output:
   xaringan::moon_reader:
-    css: ["xaringan-themer.css", "slides.css","mycssblend.css"]
+    css: ["xaringan-themer.css", "slides-style.css","mycssblend.css"]
     lib_dir: libs
     nature:
       countdown: 150000
@@ -16,15 +16,14 @@ output:
       beforeInit: "https://platform.twitter.com/widgets.js"
     seal: true 
 ---
-
 ```{r child = "../setup.Rmd"}
 ```
 
-```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+```{r setup1, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 library(tidyverse)
-library(viridis)
-library(sugrrants)
-library(lubridate)
 library(fontawesome) 
 library(xaringanExtra)
 library(xaringanthemer)
@@ -35,6 +34,13 @@ style_mono_accent(
   code_font_google   = google_font("Fira Mono")
   )
 ```
+
+layout: true
+<div class="my-footer"><span>quinference.com</span></div>
+
+---
+
+class: middle
 
 ## Course toolkit
 
@@ -362,4 +368,19 @@ knitr::include_graphics("img/hex-australia.png")
 
 .footnote[
 Mitchell O'Hara-Wild, [useR! 2018 feature wall](https://www.mitchelloharawild.com/blog/user-2018-feature-wall/)
+]
+
+---
+class: middle
+
+.your-turn[
+**Difficulty: medium**
+- Go to [Github.com](https://github.com) and create an account using your QUB credentials.
+- Login to the [Slack channel](https://join.slack.com/t/rethinkingeco-3ss9716/shared_invite/zt-12nfdfr7o-XAy2Ef1knAKXgUNo2kWw3w) and share your username with the lecturer.
+- Create a new repository on Github called 'first repo'
+- Create a new project on your Q-RaP RStudio Cloud account by using the url of your first repo
+- create a Rmarkdown file in new RStudio project space.
+- Knit the Rmarkdown file to a html file.
+- Commit and push change to your Github repo.
+
 ]
