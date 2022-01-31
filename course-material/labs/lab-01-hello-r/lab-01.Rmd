@@ -9,7 +9,7 @@ output: github_document
 
 ```{r load-packages, message=FALSE}
 library(tidyverse) 
-library(datasauRus)
+library(tsfe)
 ```
 
 ## Exercises
@@ -23,21 +23,20 @@ Remove this text, and add your answer for Exercise 1 here.
 The answers for this Exercise are given for you below.
 But you should clean up some of the narrative so that it only includes what you want to turn in.
 
-First let's plot the data in the dino dataset:
+First let's plot the data in the ITV dataset:
 
 ```{r plot-dino, fig.height=3, fig.width=6}
-dino_data <- datasaurus_dozen %>%
-  filter(dataset == "dino")
+ITV<-ftse350 %>% filter(ticker=="ITV") %>% filter(variable=="Market Value")
 
-ggplot(data = dino_data, mapping = aes(x = x, y = y)) +
+ggplot(data = ITV, mapping = aes(x =date , y = value)) +
   geom_point()
 ```
 
 And next calculate the correlation between `x` and `y` in this dataset:
 
 ```{r cor-dino}
-dino_data %>%
-  summarize(r = cor(x, y))
+ITV %>%
+  summarize(r = cor(lag(value), value))
 ```
 
 ### Exercise 3
