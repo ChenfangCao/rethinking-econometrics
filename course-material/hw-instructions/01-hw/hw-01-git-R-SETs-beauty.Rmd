@@ -1,5 +1,5 @@
 ---
-title: "HW 01 - Pet names"
+title: "HW 01 - R, RStudio, Git, and GitHub"
 subtitle: "Meet the toolkit"
 output: 
   tufte::tufte_html:
@@ -17,13 +17,10 @@ knitr::opts_chunk$set(
   fig.width = 10
 )
 library(tidyverse)
-library(openintro)
+library(rosdata)
 library(ggrepel)
 ```
 
-```{r photo, fig.margin = TRUE, echo = FALSE, fig.width = 3, fig.cap = "Photo by Jovana Askrabic on Unsplash", eval = TRUE}
-knitr::include_graphics("img/jovana-askrabic-XYIQXLH_v0o-unsplash.jpg")
-```
 
 The goal of this assignment is to introduce you to R, RStudio, Git, and GitHub, which you'll be using throughout the course both to learn the data science concepts discussed in the course and to analyze real data and come to informed conclusions.
 
@@ -31,7 +28,7 @@ The goal of this assignment is to introduce you to R, RStudio, Git, and GitHub, 
 
 ## Prerequisites {data-link="Prerequisites"}
 
-This assignment assumes that you have reviewed the lectures titled "Meet the toolkit: Programming" and "Meet the toolkit: version control and collaboration".
+This assignment assumes that you have reviewed the lectures titled "02-Meet the toolkit".
 If you haven't yet done so, please pause and complete the following before continuing.
 
 ## Terminology
@@ -62,11 +59,11 @@ First, we will explore the fundamental building blocks of all of these tools.
 
 Before you can get started with the analysis, you need to make sure you:
 
--   have a GitHub account
+-   have a GitHub account (use your QUB email to register)
 
--   are a member of the course GitHub organization
+-   are a member of the course GitHub organization (share your username and email with lecturer to receive an invite)
 
--   are a member of the course RStudio Cloud space
+-   are a member of the course RStudio Cloud space (See Canvas Announcements for details)
 
 If you failed to confirm any of these, it means you have not yet completed the prerequisites for this assignment.
 Please go back to [Prerequisites] and complete them before continuing the assignment.
@@ -96,7 +93,7 @@ Click on the clipboard icon 📋 to copy the repo URL.
 
 ### Step 2. Go to RStudio Cloud
 
-Go to [rstudio.cloud](https://rstudio.cloud/ "RStudio Cloud") and then **navigate to the course workspace** via the left sidebar.
+Go to [qrap.rstudio.cloud](https://sso.rstudio.cloud/q-rap) and then **navigate to the course workspace** via the left sidebar.
 It's very important that you do this for two reasons:
 
 -   It's only when you're in the course workspace that you'll be able to benefit from R packages I've pre-installed for you so that your project can be configured correctly.
@@ -184,7 +181,7 @@ This might feel cumbersome.
 Bear with me... I *will* teach you how to save your password so you don't have to enter it every time.
 But for this one assignment you'll have to manually enter each time you push in order to gain some experience with it.
 
-**Thought exercise:** Which of the above steps (updating the YAML, committing, and pushing) needs to talk to GitHub?[^hw-01-pet-names-1]
+**Thought exercise:** Which of the above steps (updating the YAML, committing, and pushing) needs to talk to GitHub?[^hw-01-git-R]
 
 # Packages
 
@@ -192,7 +189,7 @@ R is an open-source language, and developers contribute functionality to R via p
 In this assignment we will use the following packages:
 
 -   **tidyverse**: a collection of packages for doing data analysis in a "tidy" way
--   **openintro**: a package that contains the datasets from OpenIntro resources
+-   **rosdata**: a package that contains the datasets from one of the course textbooks called **Regression and other stories** (See Canvas for link to book)
 
 We use the `library()` function to load packages.
 In your R Markdown document you should see an R chunk labelled `load-packages` which has the necessary code for loading both packages.
@@ -206,9 +203,8 @@ Note that these packages also get loaded in your R Markdown environment when you
 
 # Data
 
-The city of [Seattle, WA](https://en.wikipedia.org/wiki/Seattle) has an open data portal that includes pets registered in the city.
-For each registered pet, we have information on the pet's name and species.
-The data used in this exercise can be found in the **openintro** package, and it's called `seattlepets`.
+We will be using the `beauty` data from `rosdata` package which contains student teaching evaluations and some personal characteristics of the professors being evaluated.
+
 Since the dataset is distributed with the package, we don't need to load it separately; it becomes available to us when we load the package.
 
 You can view the dataset as a spreadsheet using the `View()` function.
@@ -216,49 +212,49 @@ Note that you should not put this function in your R Markdown document, but inst
 When you run this in the console, you'll see the following **data viewer** window pop up.
 
 ```{r view-data}
-View(seattlepets)
+View(beauty)
 ```
 
 ```{r data.viewer, echo = FALSE, eval = TRUE, fig.align = "left"}
 knitr::include_graphics("img/view-data.png")
 ```
 
-You can find out more about the dataset by inspecting its documentation (which contains a **data dictionary**, name of each variable and its description), which you can access by running `?seattlepets` in the Console or using the Help menu in RStudio to search for `seattlepets`.
+You can find out more about the dataset by inspecting its documentation (which contains a **data dictionary**, name of each variable and its description), which you can access by running `?beauty` in the Console or using the Help menu in RStudio to search for `beauty`.
 
 # Exercises
 
-1.  According to the data dictionary, how many pets are included in this dataset?
+1.  According to the data viewer, how many evaluations are include the dataset?
 
 🧶 ✅ ⬆️ *Write your answer in your R Markdown document under Exercise 1, knit the document, commit your changes with a commit message that says "Completed Exercise 1", and push. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards.*
 
-2.  Again, according to the data dictionary, how many variables do we have for each pet?
+2.  Again, according to the data viewer, how many variables do we have for evaluation?
 
 🧶 ✅ ⬆️ *Write your answer in your R Markdown document under Exercise 2, knit the document, commit your changes with a commit message that says "Completed Exercise 2", and push. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards.*
 
-3.  What are the three most common pet names in Seattle? To do this you will need to count the frequencies of each pet name and display the results in descending order of frequency so that you can easily see the top three most popular names. The following code does exactly that.
+3.  How many of the evaluations are for female professors? To do this you will need to count the frequencies of female indicator variable and display the results. The following code does exactly that.
 
 ```{marginfigure}
-The two lines of code can be read as "Start with the seattlepets data frame, and then count the animal_names, and display the results sorted in descending order. The 'and then' in the previous sentence maps to %>%, the pipe operator, which takes what comes before it and plugs it in as the first argument of the function that comes after it."
+The two lines of code can be read as "Start with the beauty data frame, and then count the sum up the binary variable female, and display the results. The 'and then' in the previous sentence maps to %>%, the pipe operator, which takes what comes before it and plugs it in as the first argument of the function that comes after it."
 ```
 
 ```{r}
-seattlepets %>%
-  count(animal_name, sort = TRUE)
+beauty %>%
+  summarise(no_of_female_professors=sum(female))
 ```
 
 🧶 ✅ ⬆️ *Write your answer in your R Markdown document under Exercise 3. In this exercise you will not only provide a written answer but also include some code and output. You should insert the code in the code chunk provided for you, knit the document to see the output, and then write your narrative for the answer based on the output of this function, and knit again to see your narrative, code, and output in the resulting document. Then, commit your changes with a commit message that says "Completed Exercise 3", and push. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards.*
 
-Let's also look to see what the most common pet names are for various species.
-For this we need to first `group_by()` the `species`, and then do the same counting we did before.
+Let's also look to see what the most age of the professors.
+For this we need to first `group_by()` the `age`, and then do the same counting we did before but using `tally()`.
 
 ```{marginfigure}
 Looks like many of those NAs were cats. Poor unnamed kitties…
 ```
 
-```{r species-names, eval=TRUE}
-seattlepets %>% 
-  group_by(species) %>%
-  count(animal_name, sort = TRUE)
+```{r prof-ages, eval=TRUE}
+beauty %>% 
+  group_by(age) %>%
+  tally(sort = TRUE)
 ```
 
 But this output isn't exactly what we wanted.
@@ -275,17 +271,18 @@ seattlepets %>%
   count(species, sort = TRUE)
 ```
 
-Let's search for the top 5 cat and dog names.
-To do this, we can use the `slice_max()` function.
+Let's search for the number of male and female professors in at each age level.
+To do this, we can use the `arrange()` function.
 The first argument in the function is the variable we want to select the highest values of, which is `n`.
 The second argument is the number of rows to select, which is `n = 5` for the top 5.
 It may be a bit confusing that both of these are `n`, but this is because we already have a variable called `n` in the data frame.
 
 ```{r species-names-top5, eval=TRUE}
-seattlepets %>% 
-  group_by(species) %>%
-  count(animal_name, sort = TRUE) %>% 
-  slice_max(n, n = 5)
+beauty %>% 
+  group_by(female,age) %>%
+  tally(sort = TRUE) %>%
+  arrange(age)
+
 ```
 
 1.  Based on the previous output we can easily identify the most common cat and dog names in Seattle, but the output is sorted by `n` (the frequencies) as opposed to being organized by the `species`. Build on the pipeline to arrange the results so that they're arranged by `species` first, and then `n`. This means you will need to add one more step to the pipeline, and you have two options: `arrange(species, n)` or `arrange(n, species)`. You should try both and decide which one organizes the output by species and then ranks the names in order of frequency for each species.
