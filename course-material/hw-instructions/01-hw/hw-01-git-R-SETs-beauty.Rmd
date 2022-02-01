@@ -244,11 +244,11 @@ beauty %>%
 
 🧶 ✅ ⬆️ *Write your answer in your R Markdown document under Exercise 3. In this exercise you will not only provide a written answer but also include some code and output. You should insert the code in the code chunk provided for you, knit the document to see the output, and then write your narrative for the answer based on the output of this function, and knit again to see your narrative, code, and output in the resulting document. Then, commit your changes with a commit message that says "Completed Exercise 3", and push. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards.*
 
-Let's also look to see what the most age of the professors.
+Let's also look how many professors there are at each age range and what is the dominant sex.
 For this we need to first `group_by()` the `age`, and then do the same counting we did before but using `tally()`.
 
 ```{marginfigure}
-Looks like many of those NAs were cats. Poor unnamed kitties…
+Older professors are not as common
 ```
 
 ```{r prof-ages, eval=TRUE}
@@ -258,17 +258,12 @@ beauty %>%
 ```
 
 But this output isn't exactly what we wanted.
-We wanted to know the most common cat and dog names, but there are barely any cats present in this output!
-This is because there are more dogs than cats in the dataset overall.
-We can confirm this by counting the various species in the data.
+We wanted to know the most common sex of professors at each age.
 
-```{marginfigure}
-6 pigs in the city? Ok… But we'll continue with cats and dogs.
-```
 
-```{r species, eval=TRUE}
-seattlepets %>%
-  count(species, sort = TRUE)
+```{r professors_sex, eval=TRUE}
+beauty %>%
+  count(female, sort = TRUE)
 ```
 
 Let's search for the number of male and female professors in at each age level.
@@ -285,65 +280,24 @@ beauty %>%
 
 ```
 
-1.  Based on the previous output we can easily identify the most common cat and dog names in Seattle, but the output is sorted by `n` (the frequencies) as opposed to being organized by the `species`. Build on the pipeline to arrange the results so that they're arranged by `species` first, and then `n`. This means you will need to add one more step to the pipeline, and you have two options: `arrange(species, n)` or `arrange(n, species)`. You should try both and decide which one organizes the output by species and then ranks the names in order of frequency for each species.
+1.  Based on the previous output we can easily identify the most common sex at each professor age, but the output is sorted by `n` (the frequencies) as opposed to being organized by the `female`. Build on the pipeline to arrange the results so that they're arranged by `female` first, and then `n`. This means you will need to add one more step to the pipeline, and you have two options: `arrange(age, n)` or `arrange(n, age)`. You should try both and decide which one organizes the output by species and then ranks the names in order of frequency for each species.
 
 🧶 ✅ ⬆️ *Write your answer in your R Markdown document under Exercise 4. In this exercise you're asked to complete the code provided for you. You should insert the code in the code chunk provided for you, knit the document to see the output, and then write your narrative for the answer based on the output of this function, and knit again to see your narrative, code, and output in the resulting document. Then, commit your changes with a commit message that says "Completed Exercise 4", and push. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards.*
 
-The following visualization plots the proportion of dogs with a given name versus the proportion of cats with the same name.
-The 20 most common cat and dog names are displayed.
-The diagonal line on the plot is the $x = y$ line; if a name appeared on this line, the name's popularity would be exactly the same for dogs and cats.
+The following visualization plots the student evaluation of the professor against their assessed beauty.
+The diagonal line on the plot is the $x = y$ line; fitted using OLS.
 
 ```{r eval = TRUE, echo = FALSE, fig.fullwidth = TRUE}
-# data prep
-name_props <- seattlepets %>% 
-  filter(
-    !is.na(animal_name),
-    species %in% c("Dog", "Cat")
-    ) %>%
-  group_by(species) %>% 
-  count(animal_name, sort = TRUE) %>%
-  mutate(prop = n / sum(n))
-    
-cat_name_props <- name_props %>%
-  filter(species == "Cat") %>%
-  rename(cat_prop = prop) %>%
-  slice(1:30)
-
-dog_name_props <- name_props %>%
-  filter(species == "Dog") %>%
-  rename(dog_prop = prop) %>%
-  slice(1:30)
-    
-comb_name_props <- inner_join(cat_name_props, dog_name_props, 
-                              by = "animal_name") %>%
-  ungroup() %>%
-  select(animal_name, cat_prop, dog_prop)
-    
 # create viz
-ggplot(comb_name_props, aes(x = cat_prop, y = dog_prop)) +
-  geom_abline(intercept = 0, 
-              color = COL["lgray","full"], 
-              alpha = 0.8, 
-              size = 1.5) +
-  geom_text_repel(aes(label = animal_name), 
-                  segment.color = COL["gray","full"], 
-                  seed = 291252, max.iter = 10000) +
-  geom_point(color = COL["blue","full"], alpha = 0.8) +
+ggplot(beauty, aes(x = eval, y = beauty)) +
+  geom_point() +
   theme_minimal() +
-  labs(x = "Proportion of cats", y = "Proportion of dogs") +
-  xlim(0.002, 0.01) +
-  ylim(0.002, 0.01) +
-  ggimage::geom_emoji(
-      image = "1f436", aes(x = 0.003, y = 0.009), size = 0.1
-      ) +
-  ggimage::geom_emoji(
-      image = "1f431", aes(x = 0.009, y = 0.003), size = 0.1
-      )
+  labs(x = "Student evaluaiton of teaching score", y = "Professor beauty") +
+  geom_smooth(method='lm',se = FALSE)
 ```
 
-1.  What names are more common for cats than dogs? The ones above the line or the ones below the line?
-2.  Is the relationship between the two variables (proportion of cats with a given name and proportion of dogs with a given name) positive or negative? What does this mean in context of the data?
+1.  Is the relationship between the two variables  positive or negative? What does this mean in context of the data?
 
 🧶 ✅ ⬆️ *Now is a good time to commit and push your changes to GitHub with an appropriate commit message. Commit and push all changed files so that your Git pane is cleared up afterwards. Make sure that your last push to the repo comes before the deadline. You should confirm that what you committed and pushed are indeed in your repo that we will see by visiting your repo on GitHub.*
 
-[^hw-01-pet-names-1]: Only pushing requires talking to GitHub, this is why you're asked for your password at that point.
+[^hw-01-git-R]: Only pushing requires talking to GitHub, this is why you're asked for your password at that point.
