@@ -1,0 +1,178 @@
+---
+title: "FIN7030: Times Series Financial Econometrics 3"
+subtitle: "Statistical inference and simulation"
+author: "Barry Quinn PhD CStat"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["xaringan-themer.css","css/mycssblend.css"]
+    includes:
+      after_body: insert-logo.html
+    nature:
+     countdown: 120000
+     highlightStyle: github
+     highlightLines: true
+     countIncrementalSlides: true
+     ratio: "16:9"
+     seal: True 
+---
+```{r child = "../setup.Rmd"}
+```
+
+```{r setup1, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(tidyverse)
+pacman::p_load('tidyverse','fontawesome','xaringanExtra','xaringanthemer','bayesplot','arm')
+style_mono_accent(
+  base_color = "#1c5253",
+  header_font_google = google_font("Josefin Sans"),
+  text_font_google   = google_font("Montserrat", "300", "300i"),
+  code_font_google   = google_font("Fira Mono")
+  )
+```
+
+
+class:inverse, middle
+# Learning Outcomes
+.large[
+- What is statistical inference?
+- Concluding and questions
+]
+
+---
+class: middle
+# Three challenges of statistics
+
+-.acid[Generalising from sample to population]
+-.acid[Generalising from treatment to control group]
+-.acid[Generalising from observed measurement to the underlying construct of interest]
+
+.blockquote[All three challenges can be framed as problems of prediction
+`r tufte::quote_footer("Vehtari,Gelman and Hill, 2021")`(hereafter ROS)]
+
+---
+class: middle
+# Weapon of choice in social science
+
+.glow[regression]
+
+.blockquote[ Regression is a method that allows researchers to summarisze how predictions or average values of an *outcome* vary across individuals defined by a set of predictors]
+
+.acidline[
+- Prediction: *Predicting victory or defeat in a sport contest*
+- Exploring association: *Summarising how well one variable, or set of variables, predicts outcomes, for example risk factor modelling in asset pricing*
+- Extrapolation: *Adjusting for known differences between the sample (observed data) and a population of interest, For example adjusting for Big Data online survey data for response bias*
+- Causal inference: *The most important use: estimating treatment effects by comparing outcomes under treatment and control*
+]
+
+.blockquote[A key challenge for causal inference is ensuring that treatment and control groups are similar, on average, before exposure to the treatment, or else adjusting for differences between groups- ROS ]
+
+---
+class: middle
+
+## Challenges in building, understanding, and interpreting regressions
+
+.panelset[
+.panel[
+.panel-name[Hypothetical example of regression for causal inference]
+- Start with a simple scenario comparing treatment and control groups.  
+- This condition can be approximated by *randomisation*, a design in which experimental units (in finance we can think of these a firms) are randomly assigned to treatment or control.
+- Consider the following hypothetical example where $x$ is a random market shock (the treatment) affecting only certain firms in the UK market (x=0 for control or x=1 for treatment)
+]
+.panel[.panel-name[Fake data + linear regression]
+```{r}
+set.seed(1234)
+N <- 50
+x <- runif(N, 1, 5)
+y <- rnorm(N, 10 + 3*x, 3)
+x_binary <- ifelse(x<3, 0, 1)
+data <- data.frame(N, x, y, x_binary)
+
+# linear regression model
+display(lm(y~x_binary,data))
+```
+
+]
+]
+
+
+---
+class: middle
+## Simple example of regression
+
+.panelset[
+.panel[.panel-name[Beauty and teaching evaluations]
+```{r visual data}
+library(rosdata)
+rosdata::beauty %>%
+  select(eval,beauty) %>%
+  ggplot(aes(y=beauty,x=eval)) +
+  geom_point() +
+  geom_smooth(method = "lm",se=FALSE)
+```
+
+]
+.panel[.panel-name[Frequentist inferennce]
+Does beauty predict student evaluations?
+```{r visual data}
+display(lm(eval~beauty,data=rosdata::beauty))
+```
+]
+.panel[.panel-name[Bayesian inference]
+```{r bayesian}
+library(rstanarm)
+library(bayesplot)
+library(tidyverse)
+options(mc.cores = parallel::detectCores())
+dat<-rosdata::beauty
+m1<-stan_glm(eval~beauty,data=dat)
+```
+]
+.panel[.panel-name[Plotting the uncertainty]
+```{r}
+posterior <- as.matrix(m1)
+
+plot_title <- ggtitle("Posterior distributions",
+                      "with medians and 80% intervals")
+mcmc_areas(posterior,
+           pars = c("beauty"),
+           prob = 0.8) + plot_title
+```
+
+]
+]
+
+---
+class: middle, center, hide-logo
+background-image: url(img/title_slide.png)
+background-size: cover
+
+# .acid[Thank You]
+
+# .glow[Questions?]
+
+---
+class: middle
+### Extra reading (all link to qub library ebooks)
+
+[López de Prado, Marcos. 2020. Machine Learning for Asset Managers. In Elements in Quantitative Finance. Cambridge University Press.]("https://encore.qub.ac.uk/iii/encore/record/C__Rb2203007%C2%A0")
+
+[------. 2018. Advances in Financial Machine Learning. John Wiley & Sons.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203005)
+
+[Efron, Bradley, and Trevor Hastie. 2016. Computer Age Statistical Inference. Cambridge University Press.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203007%C2%A0)
+
+[Dempster, M.A.H., Juho Kanniainen, John Keane, Erik Vynckier. 2018. High-Performance Computing in Finance: Problems, Methods, and Solutions. Cambridge University Press.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203009)
+
+[Dixon, Matthew F., Igor Halperin, and Paul Bilokon. 2020. Machine Learning in Finance: From Theory to Practice. Springer International Publishing.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203004)
+
+[Molnar,C.(2019)" Interpretable Machine Learning: A Guide for Making Black Box Models Explainable"](https://encore.qub.ac.uk/iii/encore/record/C__Rb2183044)
+
+[Gelman, A; Hill, J; & Ati Vehtari (2020)., Regression and Other stories, Wiley Publishing.](https://www-cambridge-org.queens.ezp1.qub.ac.uk/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview)
+
+[Cunningham, S. (2021). Causal inference: The mixtape. Yale University Press.](https://mixtape.scunning.com/)
+
+[Statistical rethinking : a Bayesian course with examples in R and Stan / Richard McElreath](https://encore.qub.ac.uk/iii/encore/record/C__Rb2089842__Sstatistical%20rethinking__Orightresult__U__X7?lang=eng&suite=def)
+

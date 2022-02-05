@@ -1,6 +1,6 @@
 ---
-title: "FIN7030: Times Series Financial Econometrics 2" 
-subtitle: "Meet the toolkit:<br>programming"
+title: "FIN7030: Times Series Financial Econometrics 3" 
+subtitle: "Financial data stories"
 author: "Barry Quinn"
 date: "`r Sys.Date()`"
 output:
@@ -40,6 +40,51 @@ layout: true
 <div class="my-footer"><span>quinference.com</span></div>
 
 ---
+---
+class: middle
+# Three challenges of statistics
+
+-.acid[Generalising from sample to population]
+-.acid[Generalising from treatment to control group]
+-.acid[Generalising from observed measurement to the underlying construct of interest]
+
+.blockquote[All three challenges can be framed as problems of prediction
+`r tufte::quote_footer("Vehtari,Gelman and Hill, 2021")`(hereafter ROS)]
+
+---
+class: middle
+# Weapon of choice in social science
+
+.glow[regression]
+
+.blockquote[ Regression is a method that allows researchers to summarisze how predictions or average values of an *outcome* vary across individuals defined by a set of predictors]
+
+.acidline[
+- Prediction: *Predicting victory or defeat in a sport contest*
+- Exploring association: *Summarising how well one variable, or set of variables, predicts outcomes, for example risk factor modelling in asset pricing*
+- Extrapolation: *Adjusting for known differences between the sample (observed data) and a population of interest*
+- Causal inference: *The most important use: estimating treatment effects by comparing outcomes under treatment and control*
+]
+
+.blockquote[A key challenge for causal inference is ensuring that treatment and control groups are similar, on average, before exposure to the treatment, or else adjusting for differences between groups- ROS ]
+
+---
+class: middle
+## Simple example of regression
+
+.panelset[
+.panel[.panel-name[Beauty and teaching evaluations]
+```{r}
+library(rosdata)
+rosdata::beauty %>%
+  select(eval,beauty) %>%
+  ggplot(aes(y=beauty,x=eval)) +
+  geom_point() +
+  geom_smooth(method = "lm",se=FALSE)
+```
+
+]
+
 class:middle
 
 # Asset returns
