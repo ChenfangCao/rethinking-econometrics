@@ -70,20 +70,13 @@ display(lm_1b)
 `
 ```{r }
 data %>%
-  ggplot(aes(x=x_binary,y=y)) +
+  ggplot(aes(x=x,y=y)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(x="", y="Outcome measurement",title="Regression with binary treatment") +
-  geom_text( aes(x=0.3,y=13,label=paste("Estimated treatment effect is\nslope of fitted line: ", fround(coef(lm_1a)[2], 1)),
+  labs(x="Treatment level", y="Outcome measurement",title="Regression with continuous treatment") +
+  geom_text( aes(x=3.2,y=15,label=paste("Estimated treatment\neffect per unit of x is\nslope of fitted line: ", fround(coef(lm_1b)[2], 1)),
             parse = TRUE))
-par(mar=c(3, 3, 1.5, 1), mgp=c(1.7, .5, 0), tck=-.01)
-plot(x, y, xlab="Treatment level", ylab="Outcome measurement", pch=20, cex=.5, bty="l", main="Regression with continuous treatment", cex.main=.9, cex.lab=.9, cex.axis=.9)
-abline(coef(lm_1b)[1], coef(lm_1b)[2])
-text(3.2, 15, paste("Estimated treatment\neffect per unit of x is\nslope of fitted line: ", fround(coef(lm_1b)[2], 1)), cex=.8, adj=0)
-```
 
-```{r eval=TRUE, include=FALSE}
-while (!is.null(dev.list()))  dev.off()
 ```
 
 **Simulated data from nonlinear model**
@@ -100,35 +93,27 @@ lm_2a <- lm(y ~ x, data = data)
 display(lm_2a)
 
 ```
-```{r eval=TRUE, include=FALSE}
-if (savefigs) pdf(root("03-statistical-inference-simulation/figs","overview_2a.pdf"), height=3.5, width=4.5)
+
+```{r }
+data %>%
+  ggplot(aes(x=x,y=y)) +
+  geom_point() +
+  #geom_smooth(method = "loess", se = FALSE) +
+  labs(x="Treatment level", y="Outcome measurement",title="Nonlinear treatment effect") +
+  geom_function(fun=function(x) 5+ 30*exp(-x))
+
 ```
+
 
 
 ```{r }
-par(mar=c(3, 3, 1.5, 1), mgp=c(1.7, .5, 0), tck=-.01)
-plot(x, y, xlab="Treatment level", ylab="Outcome measurement", pch=20, cex=.5, bty="l", main="Nonlinear treatment effect", cex.main=.9, cex.lab=.9, cex.axis=.9)
-curve(5 + 30*exp(-x), add=TRUE)
+data %>%
+  ggplot(aes(x=x,y=y)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+    labs(x="Treatment level", y="Outcome measurement",title="Nonlinear effect, estimated with straight line fit")
 ```
 
-
-```{r eval=TRUE, include=FALSE}
-while (!is.null(dev.list()))  dev.off()
-```
-
-```{r eval=TRUE, include=FALSE}
-if (savefigs) pdf(root("03-statistical-inference-simulation/figs","overview_2b.pdf"), height=3.5, width=4.5)
-```
-
-```{r }
-par(mar=c(3, 3, 1.5, 1), mgp=c(1.7, .5, 0), tck=-.01)
-plot(x, y, xlab="Treatment level", ylab="Outcome measurement", pch=20, cex=.5, bty="l", main="Nonlinear effect, estimated with straight line fit", cex.main=.9, cex.lab=.9, cex.axis=.9)
-abline(coef(lm_2a)[1], coef(lm_2a)[2])
-```
-
-```{r eval=FALSE, include=FALSE}
-while (!is.null(dev.list()))  dev.off()
-```
 
 **Simulated data from two groups**
 
@@ -145,13 +130,14 @@ display(lm_2)
 ```
 
 
-```{r eval=TRUE, include=FALSE}
-if (savefigs) pdf(root("03-statistical-inference-simulation/figs","overview_3.pdf"), height=3.5, width=4.5)
-```
-
-
 ```{r }
-par(mar=c(3, 3, 1.5, 1), mgp=c(1.7, .5, 0), tck=-.01)
+
+data %>%
+  ggplot(aes(x=xx,y=yy)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+    labs(x="Pre- treatment predictor", y="Outcome measurement",title="Continuous pre-treatment predictor and binary treatment")
+
 plot(xx, yy, xlab="Pre-treatment predictor", ylab="Outcome measurement", bty="l", main="Continuous pre-treatment predictor and binary treatment    ", cex.main=.9, cex.lab=.9, cex.axis=.9, type="n")
 points(xx[z==0], yy[z==0], pch=20, cex=.5)
 points(xx[z==1], yy[z==1], pch=1, cex=1)
