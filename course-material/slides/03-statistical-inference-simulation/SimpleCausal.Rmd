@@ -133,21 +133,13 @@ display(lm_2)
 ```{r }
 
 data %>%
-  ggplot(aes(x=xx,y=yy)) +
+  ggplot(aes(x=xx,y=yy,colour=as.factor(z))) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
-    labs(x="Pre- treatment predictor", y="Outcome measurement",title="Continuous pre-treatment predictor and binary treatment")
-
-plot(xx, yy, xlab="Pre-treatment predictor", ylab="Outcome measurement", bty="l", main="Continuous pre-treatment predictor and binary treatment    ", cex.main=.9, cex.lab=.9, cex.axis=.9, type="n")
-points(xx[z==0], yy[z==0], pch=20, cex=.5)
-points(xx[z==1], yy[z==1], pch=1, cex=1)
-abline(coef(lm_2)[1], coef(lm_2)[2])
-abline(coef(lm_2)[1] + coef(lm_2)[3], coef(lm_2)[2])
-text(2.3, 27, "Controls", cex=.9, adj=0)
-text(1.5, 45, "Treated", cex=.9, adj=0)
-x0 <- 5.2
-arrows(x0, coef(lm_2)[1] + coef(lm_2)[2]*x0, x0, coef(lm_2)[1] + coef(lm_2)[2]*x0 + coef(lm_2)[3], length=.1, code=3)
-text(x0+.1, coef(lm_2)[1] + coef(lm_2)[2]*x0 + .5*coef(lm_2)[3], paste("Estimated\ntreatment\neffect is", fround(coef(lm_2)[3], 1)), cex=.8, adj=0)
+    labs(x="Pre- treatment predictor", y="Outcome measurement",title="Continuous pre-treatment predictor and binary treatment") +
+  geom_abline(intercept =coef(lm_2)[1],slope = coef(lm_2)[2] ) +
+  geom_abline(coef(lm_2)[2]+coef(lm_2)[3],slope =coef(lm_2)[2]) +
+geom_abline(coef(lm_2)[1] + coef(lm_2)[3])+
+  geom_text(x0+.1, coef(lm_2)[1] + coef(lm_2)[2]*x0 + .5*coef(lm_2)[3], label=paste("Estimated\ntreatment\neffect is", fround(coef(lm_2)[3], 1)))
 ```
 
 ```{r eval=TRUE, include=FALSE}
