@@ -201,6 +201,7 @@ class: middle
 
 ## Hypothetical causal adjustment example
 
+.panelset[.panel[.panel-name[Fake data with imbalance in groups]
 ```{r,echo=FALSE}
 N <- 100
 xx <- rnorm(N, 0, 1)^2
@@ -209,17 +210,75 @@ xx <- ifelse(z==0, rnorm(N, 0, 1.2)^2, rnorm(N, 0, .8)^2)
 yy <- rnorm(N, 20 + 5*xx + 10*z, 3)
 data <- data.frame(xx, z, yy)
 lm_2 <- lm(yy ~ xx + z, data=data)
-display(lm_2)
+```
+
+```{r,include=FALSE}
+data %>%
+  group_by(z) %>%
+  dplyr::summarise(mean(xx),mean(yy))->means
 ```
 
 ```{r}
-
+display(lm_2)
 ```
+This hypothetical example can be summarised as follows:
+.blockquote[On average, the treated units were 5.02 points higher than the control, $\bar{y}$=`r means[2,3]` for the treated and $\bar{y}$=`r means[1,3]` for the controls. But the two groups differed in their pre-treatment predictor: $\bar{x}$=`r means[2,2]` for treated and  $\bar{x}$=`r means[2,2]` for controls.  After adjusting for this difference, we obtained an estimated treatment effect of 10.0]
+]
+.panel[.panel-name[Visualise data + model]
+```{r, echo=FALSE}
+x0 <- 5.2
+data %>%
+  ggplot(aes(x=xx,y=yy,colour=as.factor(z))) +
+  geom_point() +
+    labs(x="Pre- treatment predictor", y="Outcome measurement",title="Continuous pre-treatment predictor and binary treatment") +
+  geom_abline(intercept =coef(lm_2)[1],slope = coef(lm_2)[2] ) +
+  geom_abline(intercept=coef(lm_2)[1]+coef(lm_2)[3],slope =coef(lm_2)[2]) +
+geom_text(aes(2.3, 29.5, label="Controls")) +
+geom_text(aes(1.5, 45, label="Treated")) + 
+  geom_text(aes(x0+.1, coef(lm_2)[1] + coef(lm_2)[2]*x0 + .5*coef(lm_2)[3], label=paste("Estimated\ntreatment\neffect is", fround(coef(lm_2)[3], 1)))) +
+  geom_segment(aes(x=x0, y=coef(lm_2)[1] + coef(lm_2)[2]*x0, xend=x0, yend=coef(lm_2)[1] + coef(lm_2)[2]*x0 + coef(lm_2)[3]), arrow = arrow(length = unit(0.1, "cm")))
+```
+]
+]
 
 ---
 class: middle
 
-## Simple example of regression with real data
+## Building interpreting and checking regression models
+
+* Model building, starting with simple linear models of the form, $y=a+bx+err0r$ and expanding through additional predictors, interactions, and transformations.
+
+* Model fitting, which includes data manipulation, programming, and the use of algorithms to estimate regression coefficients and their uncertainties and to make probabilistic predictions.
+
+* Understanding model fits, which involves graphics, more programming, and an active investigation of the (imperfect) connections between measurements, parameters, and the underlying objects of study.
+
+• Criticism, which is not just about finding flaws and identifying questionable assumptions, but is also about considering directions for improvement of models. Or, if nothing else, limiting the claims that might be made by a naive reading of a fitted model.
+
+The next step is to return to the model-building step, possibly incorporating new data in this effort. 
+
+---
+class: middle
+
+## Classical and Bayesian inference
+
+- As open science econometricians we mostly fit models to data and uses model to predict.
+- There are three concerns common to all all stesp in this framework
+
+1. What **information** is used in the estimation process
+2. What **assumptions** are made
+3. How estimates and predictions are interpreted in a Classical or Bayesian framework
+
+---
+class: middle
+
+## Information
+
+- In regressions we usually have data on an outcome 
+
+---
+class: middle
+
+## Computing least squares
 
 .panelset[
 .panel[.panel-name[Beauty and teaching evaluations]

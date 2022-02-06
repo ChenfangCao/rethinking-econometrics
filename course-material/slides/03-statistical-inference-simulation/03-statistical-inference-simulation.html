@@ -117,13 +117,13 @@ display(lm_1a)
 ```
 
 ```
-lm(formula = y ~ x_binary, data = data)
-            coef.est coef.se
-(Intercept) 15.01     0.73  
-x_binary     5.89     1.03  
----
-n = 50, k = 2
-residual sd = 3.63, R-Squared = 0.41
+## lm(formula = y ~ x_binary, data = data)
+##             coef.est coef.se
+## (Intercept) 15.01     0.73  
+## x_binary     5.89     1.03  
+## ---
+## n = 50, k = 2
+## residual sd = 3.63, R-Squared = 0.41
 ```
 ]
 .pull-right[
@@ -153,19 +153,19 @@ display(lm_1b)
 ```
 
 ```
-lm(formula = y ~ x, data = data)
-            coef.est coef.se
-(Intercept) 8.87     1.37   
-x           3.16     0.45   
----
-n = 50, k = 2
-residual sd = 3.30, R-Squared = 0.51
+## lm(formula = y ~ x, data = data)
+##             coef.est coef.se
+## (Intercept) 8.87     1.37   
+## x           3.16     0.45   
+## ---
+## n = 50, k = 2
+## residual sd = 3.30, R-Squared = 0.51
 ```
 
 ]
 .panel[.panel-name[Visualise data and model]
 
-&lt;img src="03-statistical-inference-simulation_files/figure-html/unnamed-chunk-7-1.png" width="60%" /&gt;
+&lt;img src="03-statistical-inference-simulation_files/figure-html/unnamed-chunk-5-1.png" width="60%" /&gt;
 ]
 ]
 
@@ -185,21 +185,21 @@ display(lm_2a)
 ```
 
 ```
-lm(formula = y ~ x, data = data)
-            coef.est coef.se
-(Intercept) 13.92     0.86  
-x           -2.11     0.28  
----
-n = 50, k = 2
-residual sd = 2.08, R-Squared = 0.54
+## lm(formula = y ~ x, data = data)
+##             coef.est coef.se
+## (Intercept) 13.92     0.86  
+## x           -2.11     0.28  
+## ---
+## n = 50, k = 2
+## residual sd = 2.08, R-Squared = 0.54
 ```
 ]
 .panel[.panel-name[Visual data + *true* non-linear effect]
-&lt;img src="03-statistical-inference-simulation_files/figure-html/unnamed-chunk-9-1.png" width="60%" /&gt;
+&lt;img src="03-statistical-inference-simulation_files/figure-html/unnamed-chunk-7-1.png" width="60%" /&gt;
 
 ]
 .panel[.panel-name[Visual data + linear effect model]
-&lt;img src="03-statistical-inference-simulation_files/figure-html/unnamed-chunk-10-1.png" width="60%" /&gt;
+&lt;img src="03-statistical-inference-simulation_files/figure-html/unnamed-chunk-8-1.png" width="60%" /&gt;
 
 ]
 ]
@@ -209,24 +209,72 @@ class: middle
 
 ## Hypothetical causal adjustment example
 
+.panelset[.panel[.panel-name[Fake data with imbalance in groups]
 
-```
-lm(formula = yy ~ xx + z, data = data)
-            coef.est coef.se
-(Intercept) 20.47     0.60  
-xx           4.90     0.33  
-z            9.50     0.72  
----
-n = 100, k = 3
-residual sd = 3.49, R-Squared = 0.77
+
+
+
+
+```r
+display(lm_2)
 ```
 
-
+```
+## lm(formula = yy ~ xx + z, data = data)
+##             coef.est coef.se
+## (Intercept) 20.47     0.60  
+## xx           4.90     0.33  
+## z            9.50     0.72  
+## ---
+## n = 100, k = 3
+## residual sd = 3.49, R-Squared = 0.77
+```
+This hypothetical example can be summarised as follows:
+.blockquote[On average, the treated units were 5.02 points higher than the control, `\(\bar{y}\)`=32.6521878 for the treated and `\(\bar{y}\)`=25.5195435 for the controls. But the two groups differed in their pre-treatment predictor: `\(\bar{x}\)`=0.5462456 for treated and  `\(\bar{x}\)`=0.5462456 for controls.  After adjusting for this difference, we obtained an estimated treatment effect of 10.0]
+]
+.panel[.panel-name[Visualise data + model]
+&lt;img src="03-statistical-inference-simulation_files/figure-html/unnamed-chunk-12-1.png" width="60%" /&gt;
+]
+]
 
 ---
 class: middle
 
-## Simple example of regression with real data
+## Building interpreting and checking regression models
+
+* Model building, starting with simple linear models of the form, `\(y=a+bx+err0r\)` and expanding through additional predictors, interactions, and transformations.
+
+* Model fitting, which includes data manipulation, programming, and the use of algorithms to estimate regression coefficients and their uncertainties and to make probabilistic predictions.
+
+* Understanding model fits, which involves graphics, more programming, and an active investigation of the (imperfect) connections between measurements, parameters, and the underlying objects of study.
+
+• Criticism, which is not just about finding flaws and identifying questionable assumptions, but is also about considering directions for improvement of models. Or, if nothing else, limiting the claims that might be made by a naive reading of a fitted model.
+
+The next step is to return to the model-building step, possibly incorporating new data in this effort. 
+
+---
+class: middle
+
+## Classical and Bayesian inference
+
+- As open science econometricians we mostly fit models to data and uses model to predict.
+- There are three concerns common to all all stesp in this framework
+
+1. What **information** is used in the estimation process
+2. What **assumptions** are made
+3. How estimates and predictions are interpreted in a Classical or Bayesian framework
+
+---
+class: middle
+
+## Information
+
+- In regressions we usually have data on an outcome 
+
+---
+class: middle
+
+## Computing least squares
 
 .panelset[
 .panel[.panel-name[Beauty and teaching evaluations]
@@ -241,13 +289,13 @@ display(lm(eval~beauty,data=rosdata::beauty))
 ```
 
 ```
-lm(formula = eval ~ beauty, data = rosdata::beauty)
-            coef.est coef.se
-(Intercept) 4.01     0.03   
-beauty      0.13     0.03   
----
-n = 463, k = 2
-residual sd = 0.55, R-Squared = 0.04
+## lm(formula = eval ~ beauty, data = rosdata::beauty)
+##             coef.est coef.se
+## (Intercept) 4.01     0.03   
+## beauty      0.13     0.03   
+## ---
+## n = 463, k = 2
+## residual sd = 0.55, R-Squared = 0.04
 ```
 ]
 .panel[.panel-name[Bayesian inference]
@@ -255,38 +303,38 @@ residual sd = 0.55, R-Squared = 0.04
 
 
 ```
-
-Model Info:
- function:     stan_glm
- family:       gaussian [identity]
- formula:      eval ~ beauty
- algorithm:    sampling
- sample:       4000 (posterior sample size)
- priors:       see help('prior_summary')
- observations: 463
- predictors:   2
-
-Estimates:
-              mean   sd     10%    50%    90% 
-(Intercept) 4.0102 0.0247 3.9785 4.0103 4.0413
-beauty      0.1326 0.0322 0.0908 0.1330 0.1743
-sigma       0.5463 0.0176 0.5242 0.5459 0.5692
-
-Fit Diagnostics:
-           mean   sd     10%    50%    90% 
-mean_PPD 3.9983 0.0358 3.9511 3.9987 4.0435
-
-The mean_ppd is the sample average posterior predictive distribution of the outcome variable (for details see help('summary.stanreg')).
-
-MCMC diagnostics
-              mcse   Rhat   n_eff
-(Intercept)   0.0004 0.9999 4025 
-beauty        0.0005 0.9997 3783 
-sigma         0.0003 1.0001 3995 
-mean_PPD      0.0006 0.9994 4127 
-log-posterior 0.0253 1.0009 2106 
-
-For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure of effective sample size, and Rhat is the potential scale reduction factor on split chains (at convergence Rhat=1).
+## 
+## Model Info:
+##  function:     stan_glm
+##  family:       gaussian [identity]
+##  formula:      eval ~ beauty
+##  algorithm:    sampling
+##  sample:       4000 (posterior sample size)
+##  priors:       see help('prior_summary')
+##  observations: 463
+##  predictors:   2
+## 
+## Estimates:
+##               mean   sd     10%    50%    90% 
+## (Intercept) 4.0102 0.0247 3.9785 4.0103 4.0413
+## beauty      0.1326 0.0322 0.0908 0.1330 0.1743
+## sigma       0.5463 0.0176 0.5242 0.5459 0.5692
+## 
+## Fit Diagnostics:
+##            mean   sd     10%    50%    90% 
+## mean_PPD 3.9983 0.0358 3.9511 3.9987 4.0435
+## 
+## The mean_ppd is the sample average posterior predictive distribution of the outcome variable (for details see help('summary.stanreg')).
+## 
+## MCMC diagnostics
+##               mcse   Rhat   n_eff
+## (Intercept)   0.0004 0.9999 4025 
+## beauty        0.0005 0.9997 3783 
+## sigma         0.0003 1.0001 3995 
+## mean_PPD      0.0006 0.9994 4127 
+## log-posterior 0.0253 1.0009 2106 
+## 
+## For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure of effective sample size, and Rhat is the potential scale reduction factor on split chains (at convergence Rhat=1).
 ```
 ]
 .panel[.panel-name[Plotting the uncertainty]
