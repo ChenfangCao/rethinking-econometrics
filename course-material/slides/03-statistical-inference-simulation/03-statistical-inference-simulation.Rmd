@@ -6,9 +6,7 @@ date: "`r Sys.Date()`"
 output:
   xaringan::moon_reader:
     lib_dir: libs
-    css: ["xaringan-themer.css","css/mycssblend.css"]
-    includes:
-      after_body: insert-logo.html
+    css: ["xaringan-themer.css","mycssblend.css","slides-style.css"]
     nature:
      countdown: 120000
      highlightStyle: github
@@ -23,9 +21,11 @@ output:
 ```{r setup1, include=FALSE}
 options(htmltools.dir.version = FALSE)
 library(knitr)
-knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE,out.width = "60%")
 library(tidyverse)
 pacman::p_load('tidyverse','fontawesome','xaringanExtra','xaringanthemer','bayesplot','arm')
+use_panelset()
+use_tile_view()
 style_mono_accent(
   base_color = "#1c5253",
   header_font_google = google_font("Josefin Sans"),
@@ -36,7 +36,9 @@ style_mono_accent(
 
 
 class:inverse, middle
+
 # Learning Outcomes
+
 .large[
 - What is statistical inference?
 - Concluding and questions
@@ -44,10 +46,13 @@ class:inverse, middle
 
 ---
 class: middle
+
 # Three challenges of statistics
 
 -.acid[Generalising from sample to population]
+
 -.acid[Generalising from treatment to control group]
+
 -.acid[Generalising from observed measurement to the underlying construct of interest]
 
 .blockquote[All three challenges can be framed as problems of prediction
@@ -55,11 +60,17 @@ class: middle
 
 ---
 class: middle
+
 # Weapon of choice in social science
 
 .glow[regression]
 
 .blockquote[ Regression is a method that allows researchers to summarisze how predictions or average values of an *outcome* vary across individuals defined by a set of predictors]
+
+---
+class: middle
+
+# Regression uses
 
 .acidline[
 - Prediction: *Predicting victory or defeat in a sport contest*
@@ -67,8 +78,12 @@ class: middle
 - Extrapolation: *Adjusting for known differences between the sample (observed data) and a population of interest, For example adjusting for Big Data online survey data for response bias*
 - Causal inference: *The most important use: estimating treatment effects by comparing outcomes under treatment and control*
 ]
+---
+class: middle
 
-.blockquote[A key challenge for causal inference is ensuring that treatment and control groups are similar, on average, before exposure to the treatment, or else adjusting for differences between groups- ROS ]
+# Weapon of choice in social science
+
+.blockquote.large[A key challenge for causal inference is ensuring that treatment and control groups are similar, on average, before exposure to the treatment, or else adjusting for differences between groups- ROS]
 
 ---
 class: middle
@@ -82,33 +97,137 @@ class: middle
 - This condition can be approximated by *randomisation*, a design in which experimental units (in finance we can think of these a firms) are randomly assigned to treatment or control.
 - Consider the following hypothetical example where $x$ is a random market shock (the treatment) affecting only certain firms in the UK market (x=0 for control or x=1 for treatment)
 ]
-.panel[.panel-name[Fake data + linear regression]
+.panel[.panel-name[Fake data + linear regression with binary predictor]
+.pull-left[
 ```{r}
-set.seed(1234)
 N <- 50
 x <- runif(N, 1, 5)
 y <- rnorm(N, 10 + 3*x, 3)
 x_binary <- ifelse(x<3, 0, 1)
 data <- data.frame(N, x, y, x_binary)
-
-# linear regression model
-display(lm(y~x_binary,data))
+lm_1a<-lm(y~x_binary,data)
+display(lm_1a)
 ```
+]
+.pull-right[
+- If we can assume comparability of the groups assigned to different treatments, a regression predicting the outcome given treatment gives us a direct estimate of the causal effect.
+- .acidline[We will come back to the important set of assumptions charges this statistically engineered robot with causal inference power]
+- The results opposite show that the treatement as a positive and significant effect on our outcome measure.
+]
+]
+.panel[.panel-name[Visualising data + model]
+```{r, include=FALSE }
+data %>%
+  ggplot(aes(x=x_binary,y=y)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x="", y="Outcome measurement",title="Regression with binary treatment") +
+  geom_text( aes(x=0.3,y=13,label=paste("Estimated treatment effect is\nslope of fitted line: ", fround(coef(lm_1a)[2], 1)),
+            parse = TRUE))
 
+```
+]
 ]
 ]
 
 
 ---
 class: middle
-## Simple example of regression
+
+## linear regression with continous predictor
+
+.panelset[
+.panel[.panel-name[linear regression output]
+```{r}
+lm_1b <- lm(y ~ x, data = data)
+display(lm_1b)
+```
+
+]
+.panel[.panel-name[Visualise data and model]
+
+```{r, echo=FALSE}
+data %>%
+  ggplot(aes(x=x,y=y)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x="Treatment level", y="Outcome measurement",title="Regression with continuous treatment") +
+  geom_text( aes(x=3.2,y=15,label=paste("Estimated treatment\neffect per unit of x is\nslope of fitted line: ", fround(coef(lm_1b)[2], 1)),
+            parse = TRUE))
+
+```
+]
+]
+
+---
+class: middle
+
+## Non-linear predictor
+
+.panelset[
+.panel[.panel-name[Fake data + regression]
+```{r}
+y <- rnorm(N, 5 + 30*exp(-x), 2)
+data$y <- y
+lm_2a <- lm(y ~ x, data = data)
+display(lm_2a)
+```
+]
+.panel[.panel-name[Visual data + *true* non-linear effect]
+```{r, echo=FALSE}
+data %>%
+  ggplot(aes(x=x,y=y)) +
+  geom_point() +
+  #geom_smooth(method = "loess", se = FALSE) +
+  labs(x="Treatment level", y="Outcome measurement",title="Nonlinear treatment effect") +
+  geom_function(fun=function(x) 5+ 30*exp(-x))
+```
+
+]
+.panel[.panel-name[Visual data + linear effect model]
+```{r, echo=FALSE}
+data %>%
+  ggplot(aes(x=x,y=y)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+    labs(x="Treatment level", y="Outcome measurement",title="Nonlinear effect, estimated with straight line fit")
+```
+
+]
+]
+
+---
+class: middle
+
+## Hypothetical causal adjustment example
+
+```{r,echo=FALSE}
+N <- 100
+xx <- rnorm(N, 0, 1)^2
+z <- rep(0:1, N/2)
+xx <- ifelse(z==0, rnorm(N, 0, 1.2)^2, rnorm(N, 0, .8)^2)
+yy <- rnorm(N, 20 + 5*xx + 10*z, 3)
+data <- data.frame(xx, z, yy)
+lm_2 <- lm(yy ~ xx + z, data=data)
+display(lm_2)
+```
+
+```{r}
+
+```
+
+---
+class: middle
+
+## Simple example of regression with real data
 
 .panelset[
 .panel[.panel-name[Beauty and teaching evaluations]
-```{r visual data}
+```{r visual data,echo=FALSE}
 library(rosdata)
-rosdata::beauty %>%
-  select(eval,beauty) %>%
+beauty<-rosdata::beauty
+beauty %>%
+  dplyr::select(eval,beauty) %>%
   ggplot(aes(y=beauty,x=eval)) +
   geom_point() +
   geom_smooth(method = "lm",se=FALSE)
@@ -117,24 +236,26 @@ rosdata::beauty %>%
 ]
 .panel[.panel-name[Frequentist inferennce]
 Does beauty predict student evaluations?
-```{r visual data}
+```{r}
 display(lm(eval~beauty,data=rosdata::beauty))
 ```
 ]
 .panel[.panel-name[Bayesian inference]
-```{r bayesian}
+```{r bayesian, include=FALSE}
 library(rstanarm)
 library(bayesplot)
 library(tidyverse)
 options(mc.cores = parallel::detectCores())
-dat<-rosdata::beauty
-m1<-stan_glm(eval~beauty,data=dat)
+m1<-stan_glm(eval~beauty,data=beauty)
+```
+
+```{r, echo=FALSE}
+summary(m1, digits = 4)
 ```
 ]
 .panel[.panel-name[Plotting the uncertainty]
-```{r}
+```{r echo=FALSE}
 posterior <- as.matrix(m1)
-
 plot_title <- ggtitle("Posterior distributions",
                       "with medians and 80% intervals")
 mcmc_areas(posterior,

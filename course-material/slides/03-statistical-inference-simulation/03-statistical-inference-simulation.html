@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>FIN7030: Times Series Financial Econometrics 3</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Barry Quinn PhD CStat" />
+    <meta name="date" content="2022-02-06" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="mycssblend.css" type="text/css" />
+    <link rel="stylesheet" href="slides-style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# FIN7030: Times Series Financial Econometrics 3
+## Statistical inference and simulation
+### Barry Quinn PhD CStat
+### 2022-02-06
+
+---
+
+
+
+
+layout: true
+&lt;div class="my-footer"&gt;
+&lt;span&gt;
+&lt;a href="https://quinference.com" target="_blank"&gt;&lt;b&gt;quinference.com&lt;/b&gt;&lt;/a&gt; - Dr. Barry Quinn
+&lt;/span&gt;
+&lt;/div&gt; 
+---
+
+
+
+
+class:inverse, middle
+
+# Learning Outcomes
+
+.large[
+- What is statistical inference?
+- Concluding and questions
+]
+
+---
+class: middle
+
+# Three challenges of statistics
+
+-.acid[Generalising from sample to population]
+
+-.acid[Generalising from treatment to control group]
+
+-.acid[Generalising from observed measurement to the underlying construct of interest]
+
+.blockquote[All three challenges can be framed as problems of prediction
+&lt;footer&gt;Vehtari,Gelman and Hill, 2021&lt;/footer&gt;(hereafter ROS)]
+
+---
+class: middle
+
+# Weapon of choice in social science
+
+.glow[regression]
+
+.blockquote[ Regression is a method that allows researchers to summarisze how predictions or average values of an *outcome* vary across individuals defined by a set of predictors]
+
+---
+class: middle
+
+# Regression uses
+
+.acidline[
+- Prediction: *Predicting victory or defeat in a sport contest*
+- Exploring association: *Summarising how well one variable, or set of variables, predicts outcomes, for example risk factor modelling in asset pricing*
+- Extrapolation: *Adjusting for known differences between the sample (observed data) and a population of interest, For example adjusting for Big Data online survey data for response bias*
+- Causal inference: *The most important use: estimating treatment effects by comparing outcomes under treatment and control*
+]
+---
+class: middle
+
+# Weapon of choice in social science
+
+.blockquote.large[A key challenge for causal inference is ensuring that treatment and control groups are similar, on average, before exposure to the treatment, or else adjusting for differences between groups- ROS]
+
+---
+class: middle
+
+## Challenges in building, understanding, and interpreting regressions
+
+.panelset[
+.panel[
+.panel-name[Hypothetical example of regression for causal inference]
+- Start with a simple scenario comparing treatment and control groups.  
+- This condition can be approximated by *randomisation*, a design in which experimental units (in finance we can think of these a firms) are randomly assigned to treatment or control.
+- Consider the following hypothetical example where `\(x\)` is a random market shock (the treatment) affecting only certain firms in the UK market (x=0 for control or x=1 for treatment)
+]
+.panel[.panel-name[Fake data + linear regression with binary predictor]
+.pull-left[
+
+```r
+N &lt;- 50
+x &lt;- runif(N, 1, 5)
+y &lt;- rnorm(N, 10 + 3*x, 3)
+x_binary &lt;- ifelse(x&lt;3, 0, 1)
+data &lt;- data.frame(N, x, y, x_binary)
+lm_1a&lt;-lm(y~x_binary,data)
+display(lm_1a)
+```
+
+```
+lm(formula = y ~ x_binary, data = data)
+            coef.est coef.se
+(Intercept) 15.01     0.73  
+x_binary     5.89     1.03  
+---
+n = 50, k = 2
+residual sd = 3.63, R-Squared = 0.41
+```
+]
+.pull-right[
+- If we can assume comparability of the groups assigned to different treatments, a regression predicting the outcome given treatment gives us a direct estimate of the causal effect.
+- .acidline[We will come back to the important set of assumptions charges this statistically engineered robot with causal inference power]
+- The results opposite show that the treatement as a positive and significant effect on our outcome measure.
+]
+]
+.panel[.panel-name[Visualising data + model]
+
+]
+]
+]
+
+
+---
+class: middle
+
+## linear regression with continous predictor
+
+.panelset[
+.panel[.panel-name[linear regression output]
+
+```r
+lm_1b &lt;- lm(y ~ x, data = data)
+display(lm_1b)
+```
+
+```
+lm(formula = y ~ x, data = data)
+            coef.est coef.se
+(Intercept) 8.87     1.37   
+x           3.16     0.45   
+---
+n = 50, k = 2
+residual sd = 3.30, R-Squared = 0.51
+```
+
+]
+.panel[.panel-name[Visualise data and model]
+
+&lt;img src="03-statistical-inference-simulation_files/figure-html/unnamed-chunk-7-1.png" width="60%" /&gt;
+]
+]
+
+---
+class: middle
+
+## Non-linear predictor
+
+.panelset[
+.panel[.panel-name[Fake data + regression]
+
+```r
+y &lt;- rnorm(N, 5 + 30*exp(-x), 2)
+data$y &lt;- y
+lm_2a &lt;- lm(y ~ x, data = data)
+display(lm_2a)
+```
+
+```
+lm(formula = y ~ x, data = data)
+            coef.est coef.se
+(Intercept) 13.92     0.86  
+x           -2.11     0.28  
+---
+n = 50, k = 2
+residual sd = 2.08, R-Squared = 0.54
+```
+]
+.panel[.panel-name[Visual data + *true* non-linear effect]
+&lt;img src="03-statistical-inference-simulation_files/figure-html/unnamed-chunk-9-1.png" width="60%" /&gt;
+
+]
+.panel[.panel-name[Visual data + linear effect model]
+&lt;img src="03-statistical-inference-simulation_files/figure-html/unnamed-chunk-10-1.png" width="60%" /&gt;
+
+]
+]
+
+---
+class: middle
+
+## Hypothetical causal adjustment example
+
+
+```
+lm(formula = yy ~ xx + z, data = data)
+            coef.est coef.se
+(Intercept) 20.47     0.60  
+xx           4.90     0.33  
+z            9.50     0.72  
+---
+n = 100, k = 3
+residual sd = 3.49, R-Squared = 0.77
+```
+
+
+
+---
+class: middle
+
+## Simple example of regression with real data
+
+.panelset[
+.panel[.panel-name[Beauty and teaching evaluations]
+&lt;img src="03-statistical-inference-simulation_files/figure-html/visual data-1.png" width="60%" /&gt;
+
+]
+.panel[.panel-name[Frequentist inferennce]
+Does beauty predict student evaluations?
+
+```r
+display(lm(eval~beauty,data=rosdata::beauty))
+```
+
+```
+lm(formula = eval ~ beauty, data = rosdata::beauty)
+            coef.est coef.se
+(Intercept) 4.01     0.03   
+beauty      0.13     0.03   
+---
+n = 463, k = 2
+residual sd = 0.55, R-Squared = 0.04
+```
+]
+.panel[.panel-name[Bayesian inference]
+
+
+
+```
+
+Model Info:
+ function:     stan_glm
+ family:       gaussian [identity]
+ formula:      eval ~ beauty
+ algorithm:    sampling
+ sample:       4000 (posterior sample size)
+ priors:       see help('prior_summary')
+ observations: 463
+ predictors:   2
+
+Estimates:
+              mean   sd     10%    50%    90% 
+(Intercept) 4.0102 0.0247 3.9785 4.0103 4.0413
+beauty      0.1326 0.0322 0.0908 0.1330 0.1743
+sigma       0.5463 0.0176 0.5242 0.5459 0.5692
+
+Fit Diagnostics:
+           mean   sd     10%    50%    90% 
+mean_PPD 3.9983 0.0358 3.9511 3.9987 4.0435
+
+The mean_ppd is the sample average posterior predictive distribution of the outcome variable (for details see help('summary.stanreg')).
+
+MCMC diagnostics
+              mcse   Rhat   n_eff
+(Intercept)   0.0004 0.9999 4025 
+beauty        0.0005 0.9997 3783 
+sigma         0.0003 1.0001 3995 
+mean_PPD      0.0006 0.9994 4127 
+log-posterior 0.0253 1.0009 2106 
+
+For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure of effective sample size, and Rhat is the potential scale reduction factor on split chains (at convergence Rhat=1).
+```
+]
+.panel[.panel-name[Plotting the uncertainty]
+&lt;img src="03-statistical-inference-simulation_files/figure-html/unnamed-chunk-15-1.png" width="60%" /&gt;
+
+]
+]
+
+---
+class: middle, center, hide-logo
+background-image: url(img/title_slide.png)
+background-size: cover
+
+# .acid[Thank You]
+
+# .glow[Questions?]
+
+---
+class: middle
+### Extra reading (all link to qub library ebooks)
+
+[López de Prado, Marcos. 2020. Machine Learning for Asset Managers. In Elements in Quantitative Finance. Cambridge University Press.]("https://encore.qub.ac.uk/iii/encore/record/C__Rb2203007%C2%A0")
+
+[------. 2018. Advances in Financial Machine Learning. John Wiley &amp; Sons.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203005)
+
+[Efron, Bradley, and Trevor Hastie. 2016. Computer Age Statistical Inference. Cambridge University Press.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203007%C2%A0)
+
+[Dempster, M.A.H., Juho Kanniainen, John Keane, Erik Vynckier. 2018. High-Performance Computing in Finance: Problems, Methods, and Solutions. Cambridge University Press.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203009)
+
+[Dixon, Matthew F., Igor Halperin, and Paul Bilokon. 2020. Machine Learning in Finance: From Theory to Practice. Springer International Publishing.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203004)
+
+[Molnar,C.(2019)" Interpretable Machine Learning: A Guide for Making Black Box Models Explainable"](https://encore.qub.ac.uk/iii/encore/record/C__Rb2183044)
+
+[Gelman, A; Hill, J; &amp; Ati Vehtari (2020)., Regression and Other stories, Wiley Publishing.](https://www-cambridge-org.queens.ezp1.qub.ac.uk/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview)
+
+[Cunningham, S. (2021). Causal inference: The mixtape. Yale University Press.](https://mixtape.scunning.com/)
+
+[Statistical rethinking : a Bayesian course with examples in R and Stan / Richard McElreath](https://encore.qub.ac.uk/iii/encore/record/C__Rb2089842__Sstatistical%20rethinking__Orightresult__U__X7?lang=eng&amp;suite=def)
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": true,
+"ratio": "16:9",
+"seal": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+(function(time) {
+  var d2 = function(number) {
+    return ('0' + number).slice(-2); // left-pad 0 to minutes/seconds
+  },
+
+  time_format = function(total) {
+    var secs = Math.abs(total) / 1000;
+    var h = Math.floor(secs / 3600);
+    var m = Math.floor(secs % 3600 / 60);
+    var s = Math.round(secs % 60);
+    var res = d2(m) + ':' + d2(s);
+    if (h > 0) res = h + ':' + res;
+    return res;  // [hh:]mm:ss
+  },
+
+  slide_number_div = function(i) {
+    return document.getElementsByClassName('remark-slide-number').item(i);
+  },
+
+  current_page_number = function(i) {
+    return slide_number_div(i).firstChild.textContent;  // text "i / N"
+  };
+
+  var timer = document.createElement('span'); timer.id = 'slide-time-left';
+  var time_left = time, k = slideshow.getCurrentSlideIndex(),
+      last_page_number = current_page_number(k);
+
+  setInterval(function() {
+    time_left = time_left - 1000;
+    timer.innerHTML = ' ' + time_format(time_left);
+    if (time_left < 0) timer.style.color = 'red';
+  }, 1000);
+
+  slide_number_div(k).appendChild(timer);
+
+  slideshow.on('showSlide', function(slide) {
+    var i = slide.getSlideIndex(), n = current_page_number(i);
+    // reset timer when a new slide is shown and the page number is changed
+    if (last_page_number !== n) {
+      time_left = time; last_page_number = n;
+      timer.innerHTML = ' ' + time_format(time); timer.style.color = null;
+    }
+    slide_number_div(i).appendChild(timer);
+  });
+})(120000);
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

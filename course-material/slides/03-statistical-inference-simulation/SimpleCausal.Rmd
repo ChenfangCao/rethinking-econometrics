@@ -131,6 +131,8 @@ display(lm_2)
 
 
 ```{r }
+x0 <- 5.2
+# geom_arrows(x0, coef(lm_2)[1] + coef(lm_2)[2]*x0, x0, coef(lm_2)[1] + coef(lm_2)[2]*x0 + coef(lm_2)[3], length=.1, code=3)
 
 data %>%
   ggplot(aes(x=xx,y=yy,colour=as.factor(z))) +
