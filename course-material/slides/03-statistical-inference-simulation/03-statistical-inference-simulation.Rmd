@@ -1,10 +1,11 @@
 ---
 title: "FIN7030: Times Series Financial Econometrics 3"
-subtitle: "Statistical inference and simulation"
+subtitle: "Statistical inference"
 author: "Barry Quinn PhD CStat"
 date: "`r Sys.Date()`"
 output:
   xaringan::moon_reader:
+    self_contained: true
     lib_dir: libs
     css: ["xaringan-themer.css","mycssblend.css","slides-style.css"]
     nature:
@@ -13,7 +14,7 @@ output:
      highlightLines: true
      countIncrementalSlides: true
      ratio: "16:9"
-     seal: True 
+     seal: true 
 ---
 ```{r child = "../setup.Rmd"}
 ```
@@ -41,6 +42,10 @@ class:inverse, middle
 
 .large[
 - What is statistical inference?
+- Challenges when running regressions
+- Building and check models
+- Interpretting models
+- Bayesian and classical inference in practice
 - Concluding and questions
 ]
 
@@ -173,7 +178,8 @@ lm_2a <- lm(y ~ x, data = data)
 display(lm_2a)
 ```
 ]
-.panel[.panel-name[Visual data + *true* non-linear effect]
+.panel[
+.panel-name[Visual data + *true* non-linear effect]
 ```{r, echo=FALSE}
 data %>%
   ggplot(aes(x=x,y=y)) +
@@ -182,7 +188,6 @@ data %>%
   labs(x="Treatment level", y="Outcome measurement",title="Nonlinear treatment effect") +
   geom_function(fun=function(x) 5+ 30*exp(-x))
 ```
-
 ]
 .panel[.panel-name[Visual data + linear effect model]
 ```{r, echo=FALSE}
@@ -201,7 +206,9 @@ class: middle
 
 ## Hypothetical causal adjustment example
 
-.panelset[.panel[.panel-name[Fake data with imbalance in groups]
+.panelset[
+.panel[
+.panel-name[Fake data with imbalance in groups]
 ```{r,echo=FALSE}
 N <- 100
 xx <- rnorm(N, 0, 1)^2
@@ -218,13 +225,19 @@ data %>%
   dplyr::summarise(mean(xx),mean(yy))->means
 ```
 
+
 ```{r}
 display(lm_2)
 ```
-This hypothetical example can be summarised as follows:
-.blockquote[On average, the treated units were 5.02 points higher than the control, $\bar{y}$=`r means[2,3]` for the treated and $\bar{y}$=`r means[1,3]` for the controls. But the two groups differed in their pre-treatment predictor: $\bar{x}$=`r means[2,2]` for treated and  $\bar{x}$=`r means[2,2]` for controls.  After adjusting for this difference, we obtained an estimated treatment effect of 10.0]
+
+- This hypothetical example can be summarised as follows:
+
+- .blockquote[On average, the treated units were 5.02 points higher than the control, $\bar{y}$=`r means[2,3]` for the treated and $\bar{y}$=`r means[1,3]` for the controls. But the two groups differed in their pre-treatment predictor: $\bar{x}$=`r means[2,2]` for treated and  $\bar{x}$=`r means[2,2]` for controls.  After adjusting for this difference, we obtained an estimated treatment effect of 10.0]
+
 ]
-.panel[.panel-name[Visualise data + model]
+
+.panel[
+.panel-name[Visualise data + model]
 ```{r, echo=FALSE}
 x0 <- 5.2
 data %>%
@@ -246,7 +259,7 @@ class: middle
 
 ## Building interpreting and checking regression models
 
-* Model building, starting with simple linear models of the form, $y=a+bx+err0r$ and expanding through additional predictors, interactions, and transformations.
+* Model building, starting with simple linear models of the form, $y=a+bx+error$ and expanding through additional predictors, interactions, and transformations.
 
 * Model fitting, which includes data manipulation, programming, and the use of algorithms to estimate regression coefficients and their uncertainties and to make probabilistic predictions.
 
@@ -266,19 +279,83 @@ class: middle
 
 1. What **information** is used in the estimation process
 2. What **assumptions** are made
-3. How estimates and predictions are interpreted in a Classical or Bayesian framework
+3. How estimates and predictions are **interpreted**, in a Classical or Bayesian framework
 
 ---
 class: middle
 
 ## Information
 
-- In regressions we usually have data on an outcome 
+- In regressions we usually have data on an outcome variable and one of more predictors. 
+- As we seen previous if we have one $x$ predictor or one binary and one continuous predictor we have visual their relationship with the outcome $y$ variable
+- In finance we will also have information on what data was observed
+  - Is the data measured on a regular frequency? 
+  - Is the data free from survivorship bias?
+  - Is the data a random or convenience sample?
+
 
 ---
 class: middle
 
-## Computing least squares
+### Prior information *learning from experience*
+
+- We may also have *prior knowledge* comes from sources other than the data, based on experience with previous or similar studies. 
+- This information should be handled with care, as published research tends to overestimate effect sizes
+- This is due to researchers being under pressure to find large and *statistically significant* results
+- There are setting when local data is weak and it would be foolish to draw conclusions without using prior knowledge
+
+---
+class: middle
+
+## Assumptions
+
+1. The function form of the regression model; typically **linearity**.
+2. Where does the data come from: which potential observations are seen and which are not. A strong assumption here would be that there has been random sampling or random treatment assignment. In finance random sampling is raw.
+3. The real-world relevance of the measured data; for example are today's measurements predictive of of what happens tomorrow?. 
+- .acidinline[In time series financial econometrics we assess this statistically by comparing the stability of observations conducted in different ways or at different times.]
+
+---
+class: middle
+
+# Classical inference
+
+- Based on summarising the information in the data alone, not using prior information. 
+- Getting estimates and predictions that have well-known statistical properties, low bias and low variance.
+- This attitude is sometimes called *Frequentist*, in that classical statisticians focus on the long-run expectation of their methods.
+- Estimates should be correct on average; **unbiasedness**.
+- Confidence intervals should cover the true parameter value 95% of the time
+- An important principle of classical estimates is *conversatism*.
+- In classical statistics there should be a clear and *objective* path from data to inference, which in turn should be checkable, at least in theory, based on their frequency properties.
+
+---
+class: middle
+
+# Bayesian inference
+
+- Goes beyond summarising data to produce statistical inferences that include prior information.
+- This information could be awareness of bias, selection on unmeasured characteristics, prior information of effect sizes.
+- One strength of Bayesian inference, the analysis can provide more reasonable inferences and can be used to make direct predictions about future outcomes.
+- One weakness is the need for an additional information; the **prior distribution**, which can be contentious in that it makes some claims about the range of the prediction effects.
+
+---
+class: middle
+
+## The choice
+
+- .large[Classical inference, leading to pure summaries of data which can have limited value as predictions]
+- .large[Bayesian inference, which in theory can yield valid predictions even with weak data, but relies on additional assumptions]
+
+-.acidinline.large[A modern financial data scientist, knows there is no universally correct choice, but should be aware of both and use them pragmatically.]
+
+- .blockquote[
+- A practical advantage of Bayesian inference is that all inferences are probablistics and thus can be represented by random simulations.
+- For this reason when you want to summarise uncertainty in estimation beyond confidence intervals, and when we want to use regression models for prediction, **we go Bayesian**
+]
+
+---
+class: middle
+
+## Computing least squares and Bayesian regressions
 
 .panelset[
 .panel[.panel-name[Beauty and teaching evaluations]
@@ -305,7 +382,7 @@ library(rstanarm)
 library(bayesplot)
 library(tidyverse)
 options(mc.cores = parallel::detectCores())
-m1<-stan_glm(eval~beauty,data=beauty)
+m1<-stan_glm(eval~beauty,data=beauty,algorithm='optimizing')
 ```
 
 ```{r, echo=FALSE}
@@ -338,17 +415,6 @@ background-size: cover
 class: middle
 ### Extra reading (all link to qub library ebooks)
 
-[López de Prado, Marcos. 2020. Machine Learning for Asset Managers. In Elements in Quantitative Finance. Cambridge University Press.]("https://encore.qub.ac.uk/iii/encore/record/C__Rb2203007%C2%A0")
-
-[------. 2018. Advances in Financial Machine Learning. John Wiley & Sons.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203005)
-
-[Efron, Bradley, and Trevor Hastie. 2016. Computer Age Statistical Inference. Cambridge University Press.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203007%C2%A0)
-
-[Dempster, M.A.H., Juho Kanniainen, John Keane, Erik Vynckier. 2018. High-Performance Computing in Finance: Problems, Methods, and Solutions. Cambridge University Press.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203009)
-
-[Dixon, Matthew F., Igor Halperin, and Paul Bilokon. 2020. Machine Learning in Finance: From Theory to Practice. Springer International Publishing.](https://encore.qub.ac.uk/iii/encore/record/C__Rb2203004)
-
-[Molnar,C.(2019)" Interpretable Machine Learning: A Guide for Making Black Box Models Explainable"](https://encore.qub.ac.uk/iii/encore/record/C__Rb2183044)
 
 [Gelman, A; Hill, J; & Ati Vehtari (2020)., Regression and Other stories, Wiley Publishing.](https://www-cambridge-org.queens.ezp1.qub.ac.uk/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview)
 
