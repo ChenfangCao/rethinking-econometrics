@@ -12,6 +12,7 @@ output:
      countdown: 120000
      highlightStyle: github
      highlightLines: true
+     highlightSpans: true
      countIncrementalSlides: true
      ratio: "16:9"
      seal: true 
@@ -53,12 +54,13 @@ class:inverse, middle
 class: middle
 
 # Three challenges of statistics
+.acid[
+- Generalising from sample to population
 
--.acid[Generalising from sample to population]
+- Generalising from treatment to control group
 
--.acid[Generalising from treatment to control group]
-
--.acid[Generalising from observed measurement to the underlying construct of interest]
+- Generalising from observed measurement to the underlying construct of interest
+]
 
 .blockquote[All three challenges can be framed as problems of prediction
 `r tufte::quote_footer("Vehtari,Gelman and Hill, 2021")`(hereafter ROS)]
@@ -70,7 +72,7 @@ class: middle
 
 .glow[regression]
 
-.blockquote[ Regression is a method that allows researchers to summarisze how predictions or average values of an *outcome* vary across individuals defined by a set of predictors]
+.blockquote.large[ Regression is a method that allows researchers to summarisze how predictions or average values of an *outcome* vary across individuals defined by a set of predictors]
 
 ---
 class: middle
@@ -78,11 +80,12 @@ class: middle
 # Regression uses
 
 .acidline[
-- Prediction: *Predicting victory or defeat in a sport contest*
-- Exploring association: *Summarising how well one variable, or set of variables, predicts outcomes, for example risk factor modelling in asset pricing*
-- Extrapolation: *Adjusting for known differences between the sample (observed data) and a population of interest, For example adjusting for Big Data online survey data for response bias*
-- Causal inference: *The most important use: estimating treatment effects by comparing outcomes under treatment and control*
+- **Prediction:** *Predicting victory or defeat in a sport contest*
+- **Exploring association:** *Summarising how well one variable, or set of variables, predicts outcomes, for example risk factor modelling in asset pricing*
+- **Extrapolation:** *Adjusting for known differences between the sample (observed data) and a population of interest, For example adjusting for Big Data online survey data for response bias*
+- **Causal inference:** *The most important use: estimating treatment effects by comparing outcomes under treatment and control*
 ]
+
 ---
 class: middle
 
@@ -102,8 +105,8 @@ class: middle
 - This condition can be approximated by *randomisation*, a design in which experimental units (in finance we can think of these a firms) are randomly assigned to treatment or control.
 - Consider the following hypothetical example where $x$ is a random market shock (the treatment) affecting only certain firms in the UK market (x=0 for control or x=1 for treatment)
 ]
-.panel[.panel-name[Fake data + linear regression with binary predictor]
-.pull-left[
+.panel[.panel-name[Fake data]
+
 ```{r}
 N <- 50
 x <- runif(N, 1, 5)
@@ -111,17 +114,22 @@ y <- rnorm(N, 10 + 3*x, 3)
 x_binary <- ifelse(x<3, 0, 1)
 data <- data.frame(N, x, y, x_binary)
 lm_1a<-lm(y~x_binary,data)
-display(lm_1a)
 ```
 ]
-.pull-right[
+.panel[.panel-name[linear regression with binary predictor]
+
+.small[
+```{r}
+display(lm_1a)
+```
+
 - If we can assume comparability of the groups assigned to different treatments, a regression predicting the outcome given treatment gives us a direct estimate of the causal effect.
 - .acidline[We will come back to the important set of assumptions charges this statistically engineered robot with causal inference power]
 - The results opposite show that the treatement as a positive and significant effect on our outcome measure.
 ]
 ]
 .panel[.panel-name[Visualising data + model]
-```{r, include=FALSE }
+```{r, echo=FALSE}
 data %>%
   ggplot(aes(x=x_binary,y=y)) +
   geom_point() +
@@ -133,7 +141,6 @@ data %>%
 ```
 ]
 ]
-]
 
 
 ---
@@ -142,7 +149,10 @@ class: middle
 ## linear regression with continous predictor
 
 .panelset[
-.panel[.panel-name[linear regression output]
+.panel[.panel-name[Ethical output]
+
+- The display function from `arm` purposefully removes the visualising of p-values.
+
 ```{r}
 lm_1b <- lm(y ~ x, data = data)
 display(lm_1b)
@@ -170,16 +180,24 @@ class: middle
 ## Non-linear predictor
 
 .panelset[
-.panel[.panel-name[Fake data + regression]
+.panel[.panel-name[Fake data]
+
 ```{r}
-y <- rnorm(N, 5 + 30*exp(-x), 2)
+y <- rnorm(N, 5 + 30*exp(-x), 2) #<< Non-linear fake variable creation
 data$y <- y
 lm_2a <- lm(y ~ x, data = data)
 display(lm_2a)
 ```
 ]
+.panel[.panel-name[linear regression output]
+
+```{r}
+display(lm_2a)
+```
+
+]
 .panel[
-.panel-name[Visual data + *true* non-linear effect]
+.panel-name[Non-linear effect]
 ```{r, echo=FALSE}
 data %>%
   ggplot(aes(x=x,y=y)) +
@@ -189,7 +207,7 @@ data %>%
   geom_function(fun=function(x) 5+ 30*exp(-x))
 ```
 ]
-.panel[.panel-name[Visual data + linear effect model]
+.panel[.panel-name[Linear effect model]
 ```{r, echo=FALSE}
 data %>%
   ggplot(aes(x=x,y=y)) +
@@ -209,15 +227,23 @@ class: middle
 .panelset[
 .panel[
 .panel-name[Fake data with imbalance in groups]
-```{r,echo=FALSE}
+```{r}
 N <- 100
 xx <- rnorm(N, 0, 1)^2
 z <- rep(0:1, N/2)
 xx <- ifelse(z==0, rnorm(N, 0, 1.2)^2, rnorm(N, 0, .8)^2)
 yy <- rnorm(N, 20 + 5*xx + 10*z, 3)
 data <- data.frame(xx, z, yy)
-lm_2 <- lm(yy ~ xx + z, data=data)
 ```
+]
+.panel[
+.panel-name[regression output]
+```{r}
+lm_2 <- lm(yy ~ xx + z, data=data)
+display(lm_2)
+```
+
+- This hypothetical example can be summarised as follows:
 
 ```{r,include=FALSE}
 data %>%
@@ -225,17 +251,9 @@ data %>%
   dplyr::summarise(mean(xx),mean(yy))->means
 ```
 
-
-```{r}
-display(lm_2)
-```
-
-- This hypothetical example can be summarised as follows:
-
 - .blockquote[On average, the treated units were 5.02 points higher than the control, $\bar{y}$=`r means[2,3]` for the treated and $\bar{y}$=`r means[1,3]` for the controls. But the two groups differed in their pre-treatment predictor: $\bar{x}$=`r means[2,2]` for treated and  $\bar{x}$=`r means[2,2]` for controls.  After adjusting for this difference, we obtained an estimated treatment effect of 10.0]
 
 ]
-
 .panel[
 .panel-name[Visualise data + model]
 ```{r, echo=FALSE}
@@ -249,7 +267,8 @@ data %>%
 geom_text(aes(2.3, 29.5, label="Controls")) +
 geom_text(aes(1.5, 45, label="Treated")) + 
   geom_text(aes(x0+.1, coef(lm_2)[1] + coef(lm_2)[2]*x0 + .5*coef(lm_2)[3], label=paste("Estimated\ntreatment\neffect is", fround(coef(lm_2)[3], 1)))) +
-  geom_segment(aes(x=x0, y=coef(lm_2)[1] + coef(lm_2)[2]*x0, xend=x0, yend=coef(lm_2)[1] + coef(lm_2)[2]*x0 + coef(lm_2)[3]), arrow = arrow(length = unit(0.1, "cm")))
+  geom_segment(aes(x=x0, y=coef(lm_2)[1] + coef(lm_2)[2]*x0, xend=x0, yend=coef(lm_2)[1] + coef(lm_2)[2]*x0 + coef(lm_2)[3]), arrow = arrow(length = unit(0.1, "cm"))) +
+  theme(text = element_text(size=5))
 ```
 ]
 ]
@@ -265,9 +284,9 @@ class: middle
 
 * Understanding model fits, which involves graphics, more programming, and an active investigation of the (imperfect) connections between measurements, parameters, and the underlying objects of study.
 
-• Criticism, which is not just about finding flaws and identifying questionable assumptions, but is also about considering directions for improvement of models. Or, if nothing else, limiting the claims that might be made by a naive reading of a fitted model.
+* Criticism, which is not just about finding flaws and identifying questionable assumptions, but is also about considering directions for improvement of models. Or, if nothing else, limiting the claims that might be made by a naive reading of a fitted model.
 
-The next step is to return to the model-building step, possibly incorporating new data in this effort. 
+* The next step is to return to the model-building step, possibly incorporating new data in this effort. 
 
 ---
 class: middle
@@ -279,7 +298,7 @@ class: middle
 
 1. What **information** is used in the estimation process
 2. What **assumptions** are made
-3. How estimates and predictions are **interpreted**, in a Classical or Bayesian framework
+3. How estimates and predictions are **interpretted**, in a Classical or Bayesian framework
 
 ---
 class: middle
@@ -290,7 +309,7 @@ class: middle
 - As we seen previous if we have one $x$ predictor or one binary and one continuous predictor we have visual their relationship with the outcome $y$ variable
 - In finance we will also have information on what data was observed
   - Is the data measured on a regular frequency? 
-  - Is the data free from survivorship bias?
+  - Is the data free from survivor bias?
   - Is the data a random or convenience sample?
 
 
@@ -345,7 +364,7 @@ class: middle
 - .large[Classical inference, leading to pure summaries of data which can have limited value as predictions]
 - .large[Bayesian inference, which in theory can yield valid predictions even with weak data, but relies on additional assumptions]
 
--.acidinline.large[A modern financial data scientist, knows there is no universally correct choice, but should be aware of both and use them pragmatically.]
+- .acidinline.large[A modern financial data scientist, knows there is no universally correct choice, but should be aware of both and use them pragmatically.]
 
 - .blockquote[
 - A practical advantage of Bayesian inference is that all inferences are probablistics and thus can be represented by random simulations.
@@ -358,36 +377,48 @@ class: middle
 ## Computing least squares and Bayesian regressions
 
 .panelset[
-.panel[.panel-name[Beauty and teaching evaluations]
-```{r visual data,echo=FALSE}
+.panel[
+.panel-name[Beauty and teaching evaluations]
+
+```{r, include=FALSE}
 library(rosdata)
+library(tidyverse)
+beauty<-rosdata::beauty
+```
+
+
+```{r visual data, echo=FALSE}
+library(rosdata)
+library(tidyverse)
 beauty<-rosdata::beauty
 beauty %>%
-  dplyr::select(eval,beauty) %>%
   ggplot(aes(y=beauty,x=eval)) +
   geom_point() +
   geom_smooth(method = "lm",se=FALSE)
 ```
-
 ]
 .panel[.panel-name[Frequentist inferennce]
 Does beauty predict student evaluations?
 ```{r}
-display(lm(eval~beauty,data=rosdata::beauty))
+display(lm(eval~beauty,data=beauty))
 ```
 ]
 .panel[.panel-name[Bayesian inference]
-```{r bayesian, include=FALSE}
+```{r bayesian}
 library(rstanarm)
 library(bayesplot)
 library(tidyverse)
 options(mc.cores = parallel::detectCores())
 m1<-stan_glm(eval~beauty,data=beauty,algorithm='optimizing')
 ```
+]
+.panel[.panel-name[Bayesian regression output]
 
-```{r, echo=FALSE}
-summary(m1, digits = 4)
+.tiny[
+```{r}
+summary(m1, digits = 3)
 ```
+]
 ]
 .panel[.panel-name[Plotting the uncertainty]
 ```{r echo=FALSE}
@@ -404,7 +435,7 @@ mcmc_areas(posterior,
 
 ---
 class: middle, center, hide-logo
-background-image: url(img/title_slide.png)
+background-image: url(img/title-slide.png)
 background-size: cover
 
 # .acid[Thank You]

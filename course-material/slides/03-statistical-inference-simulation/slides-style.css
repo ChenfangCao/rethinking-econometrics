@@ -249,12 +249,12 @@ div.my-footer {
 div.my-footer span {
     font-size: 12pt;
     position: absolute;
-    color: #333333;
+    color: #f5f5f5;
     bottom: 10px;
 }
 div.my-footer a {
     font-size: 12pt;
-    color: #333333;
+    color: #f5f5f5;
 }
 
 

@@ -3,8 +3,8 @@
 options(htmltools.dir.version = FALSE)
 # figure height, width, dpi
 knitr::opts_chunk$set(echo = TRUE, 
-                      fig.width = 5, 
-                      fig.height = 3,
+                      fig.width = 6, 
+                      fig.height = 4,
                       dpi = 300)
 # fontawesome
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
