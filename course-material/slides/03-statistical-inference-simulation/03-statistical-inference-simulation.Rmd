@@ -1,5 +1,5 @@
 ---
-title: "FIN7030: Times Series Financial Econometrics 3"
+title: "FIN7028: Times Series Financial Econometrics 3"
 subtitle: "Statistical inference"
 author: "Barry Quinn PhD CStat"
 date: "`r Sys.Date()`"
@@ -7,7 +7,7 @@ output:
   xaringan::moon_reader:
     self_contained: true
     lib_dir: libs
-    css: ["xaringan-themer.css","mycssblend.css","slides-style.css"]
+    css: ["xaringan-themer.css","mycssblend.css"]
     nature:
      countdown: 120000
      highlightStyle: github
@@ -251,12 +251,12 @@ data %>%
   dplyr::summarise(mean(xx),mean(yy))->means
 ```
 
-- .blockquote[On average, the treated units were 5.02 points higher than the control, $\bar{y}$=`r means[2,3]` for the treated and $\bar{y}$=`r means[1,3]` for the controls. But the two groups differed in their pre-treatment predictor: $\bar{x}$=`r means[2,2]` for treated and  $\bar{x}$=`r means[2,2]` for controls.  After adjusting for this difference, we obtained an estimated treatment effect of 10.0]
+- On average, the treated units were 5.02 points higher than the control, $\bar{y}$=`r round(means[2,3],2)` for the treated and $\bar{y}$=`r round(means[1,3],2)` for the controls. But the two groups differed in their pre-treatment predictor: $\bar{x}$=`r round(means[2,2],2)` for treated and  $\bar{x}$=`r round(means[1,2],2)` for controls.  After adjusting for this difference, we obtained an estimated treatment effect of 10.0
 
 ]
 .panel[
 .panel-name[Visualise data + model]
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height=6,fig.width=12}
 x0 <- 5.2
 data %>%
   ggplot(aes(x=xx,y=yy,colour=as.factor(z))) +
@@ -264,11 +264,10 @@ data %>%
     labs(x="Pre- treatment predictor", y="Outcome measurement",title="Continuous pre-treatment predictor and binary treatment") +
   geom_abline(intercept =coef(lm_2)[1],slope = coef(lm_2)[2] ) +
   geom_abline(intercept=coef(lm_2)[1]+coef(lm_2)[3],slope =coef(lm_2)[2]) +
-geom_text(aes(2.3, 29.5, label="Controls")) +
-geom_text(aes(1.5, 45, label="Treated")) + 
-  geom_text(aes(x0+.1, coef(lm_2)[1] + coef(lm_2)[2]*x0 + .5*coef(lm_2)[3], label=paste("Estimated\ntreatment\neffect is", fround(coef(lm_2)[3], 1)))) +
-  geom_segment(aes(x=x0, y=coef(lm_2)[1] + coef(lm_2)[2]*x0, xend=x0, yend=coef(lm_2)[1] + coef(lm_2)[2]*x0 + coef(lm_2)[3]), arrow = arrow(length = unit(0.1, "cm"))) +
-  theme(text = element_text(size=5))
+geom_text(aes(2.3, 29.5, label="Controls"),size=4) +
+geom_text(aes(1.5, 45, label="Treated"),size=4) + 
+  geom_text(aes(x0+.1, coef(lm_2)[1] + coef(lm_2)[2]*x0 + .5*coef(lm_2)[3], label=paste("Estimated\ntreatment\neffect is", fround(coef(lm_2)[3], 1))),size=4) +
+  geom_segment(aes(x=x0, y=coef(lm_2)[1] + coef(lm_2)[2]*x0, xend=x0, yend=coef(lm_2)[1] + coef(lm_2)[2]*x0 + coef(lm_2)[3]), arrow = arrow(length = unit(0.1, "cm"))) 
 ```
 ]
 ]
@@ -367,8 +366,11 @@ class: middle
 - .acidinline.large[A modern financial data scientist, knows there is no universally correct choice, but should be aware of both and use them pragmatically.]
 
 - .blockquote[
-- A practical advantage of Bayesian inference is that all inferences are probablistics and thus can be represented by random simulations.
-- For this reason when you want to summarise uncertainty in estimation beyond confidence intervals, and when we want to use regression models for prediction, **we go Bayesian**
+
+- A practical advantage of Bayesian inference is that all inferences are probabilistic and thus can be represented by random simulations.
+
+- For this reason when you want to summarise uncertainty in estimation beyond confidence intervals, and when we want to use regression models for prediction, **we go Bayesian**.
+
 ]
 
 ---
@@ -376,26 +378,17 @@ class: middle
 
 ## Computing least squares and Bayesian regressions
 
+```{r,include=FALSE}
+source('setup.R')
+```
+
+
 .panelset[
 .panel[
 .panel-name[Beauty and teaching evaluations]
 
-```{r, include=FALSE}
-library(rosdata)
-library(tidyverse)
-beauty<-rosdata::beauty
-```
+![](beauty.png){width="50%"}
 
-
-```{r visual data, echo=FALSE}
-library(rosdata)
-library(tidyverse)
-beauty<-rosdata::beauty
-beauty %>%
-  ggplot(aes(y=beauty,x=eval)) +
-  geom_point() +
-  geom_smooth(method = "lm",se=FALSE)
-```
 ]
 .panel[.panel-name[Frequentist inferennce]
 Does beauty predict student evaluations?
@@ -414,10 +407,12 @@ m1<-stan_glm(eval~beauty,data=beauty,algorithm='optimizing')
 ]
 .panel[.panel-name[Bayesian regression output]
 
-.tiny[
-```{r}
-summary(m1, digits = 3)
+.small[
+
+```{r, out.height="50%"}
+summary(m1, digits = 2)
 ```
+
 ]
 ]
 .panel[.panel-name[Plotting the uncertainty]

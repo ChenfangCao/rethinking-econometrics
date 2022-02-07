@@ -1,14 +1,15 @@
 ---
-title: "FIN7030: Times Series Financial Econometrics 3" 
+title: "FIN7028: Times Series Financial Econometrics 3" 
 subtitle: "Financial data stories"
 author: "Barry Quinn"
 date: "`r Sys.Date()`"
 output:
   xaringan::moon_reader:
     self_contained: true
-    css: ["xaringan-themer.css", "../slides-style.css","../mycssblend.css"]
+    css: ["xaringan-themer.css","../mycssblend.css"]
     lib_dir: libs
     nature:
+      self_contained: true
       countdown: 150000
       highlightStyle: github
       highlightLines: true
@@ -34,12 +35,9 @@ style_mono_accent(
   text_font_google   = google_font("Montserrat", "300", "300i"),
   code_font_google   = google_font("Fira Mono")
   )
+load("~/Dropbox/Teaching/TSFE/data/fin7028_dat.RData")
 ```
 
-layout: true
-<div class="my-footer"><span>quinference.com</span></div>
-
----
 class: middle
 
 # Outline
@@ -91,7 +89,7 @@ class: middle
 - WRDS is best known for financial data—for example, stock prices from CRSP, or company fundamentals from Compustat.
 
 - WRDS also hosts data in a variety of other disciplines including:
-- fatinline[Accouting, Banking, Management, Economics, Marketing, Healthcare, Insurance]
+- .fatinline[Accouting, Banking, Management, Economics, Marketing, Healthcare, Insurance]
 
 ---
 class: middle
@@ -117,10 +115,14 @@ class: middle
 
 - Firstly create an account on WRDS using your QUB credentials
 
-- [Link to WRDS](https://wrds-www-wharton.upenn.edu)
+- [Link to WRDS](https://wrds-www.wharton.upenn.edu)
 
 - Wait for lecturer to confirm your account
 ]
+
+```{r echo=FALSE}
+countdown(minutes = 5, warn_when = 1)
+```
 
 ---
 class: middle
@@ -128,7 +130,8 @@ class: middle
 # Class assignment
 
 .your-turn[
-- our assignment is to access WRDS and download monthly stock prices for IBM, Amazon, and Walmart for 2020. Stock price data is provided by CRSP. 
+
+Iur assignment is to access WRDS and download monthly stock prices for IBM, Amazon, and Walmart for 2020. Stock price data is provided by CRSP. 
 
 This assignment has two parts:
 
@@ -137,6 +140,11 @@ Log in to the WRDS platform and locate the CRSP database.
 Create a data query in CRSP and view the results.
 
 ]
+```{r echo=FALSE}
+countdown(minutes = 5, warn_when = 1)
+```
+
+
 ---
 class: middle
 
@@ -167,20 +175,19 @@ class:middle
 ---
 class: middle
 
-# CRSP Page
+## CRSP Page
 
-.pull-left-1[
+.pull-left[
 - Click on Stock/Security Files
-
 - Click on CRSP. 
 ]
-.pull-right-2[
+.pull-right[
 ![](img/crsp.png)
 ]
 ---
-class: middel
+class: middle
 
-CRSP Stock/Security Files Page
+# CRSP Stock/Security Files Page
 
 .pull-left-2[
 ![](img/crsp1.png)
@@ -206,32 +213,30 @@ class: middle
 ---
 class: middle
 
----
-class: middle
-
 ## Enter the Companies
 
 .pull-left-1[
 - Make sure ticker is selected
-
 - Enter the ticker symbols for the companies: IMB AMZN WMT
 
 ]
 .pull-right-2[
 ![](img/companies.png)
+]
 ---
 class: middle
 
-# Select the Query Variables
+## Select the Query Variables
 
 .pull-left-1[
-- Select the variables you want from the Query Variables list.
 
+- Select the variables you want from the Query Variables list.
 - For this assignment, select two variables: Ticker and Price.
 
 ]
 .pull-right-2[
 ![](img/variables.png)
+]
 
 ---
 class: middle
@@ -274,13 +279,11 @@ class: middle
 
 # Query Results
 
-.pull-left[
+.pull-left-1[
 ![](img/results.png)
 ]
-.pull-right[
-.large[
+.pull-right-2[
 The monthly stock prices for IBM, Amazon, and Walmart for 2020 are displayed. 
-]
 ]
 
 ---
@@ -299,23 +302,27 @@ class: middle
 
 ]
 
-
 ---
 class: middle
 
 # Asset returns
 
-## Asset returns
+.discussion[
 - The most important financial time series are asset prices, exchange rates and interest rates.
 - Most financial studies involve returns rather than prices.
 - Campbell et al. (1997) gives two main reasons for using returns:
 1. For an average investor, returns of an asset is a complete and scale-free summary of the investment opportunity.
 2. Return series are easier to handle than price series because the former have more attractive statistical properties.
+]
+
+---
+class: middle
 
 ## One-period simple returns 
-  - Let _P~t~_ be the price of an asset at time index _t_ and assume the asset pays no dividend.
+
+- Let _P~t~_ be the price of an asset at time index _t_ and assume the asset pays no dividend.
   - **One-Period Simple Return**:
-    - Holding the asset for one period from date t-1 to date t would result in a _simple gross return_
+  - Holding the asset for one period from date t-1 to date t would result in a _simple gross return_
 
 $$ 
 1+R_t= \frac{P_t}{P_{t-1}} \;or\; P_t=P_{t-1}(1+R_t)
@@ -326,6 +333,7 @@ $$
 $$
 R_t= \frac{P_t}{P_{t-1}}-1= \;or\; \frac{P_t-P_{t-1}}{P_{t-1}}
 $$
+
 ---
 class:middle
 
@@ -339,6 +347,9 @@ $$=\prod^{k-1}_{j=0}(1+R_{t-j})$$
 
 - The _k_ period simple gross return is simply the product of the _k_ one-period simple gross returns; or the _compound return_.
 - The k-period simple net return is $R_t[k]= \frac{(P_t-P_{t-k})}{P_{t-k}}$
+
+---
+class: middle
 
 ## Time interval
 * In practice, the actual time interval is important in discussing and comparing returns (e.g., monthly returns or annual returns).
@@ -371,7 +382,7 @@ r_t=ln(1+R_t)=ln \left(\frac{P_t}{P_{t-1}} \right)=p_t-p_{t-1} \
 \text{where }p_t=ln(P_t)
 $$
 
-## Advantages
+### Advantages
 * Firstly, continuously compounded multiperiod return is simply the sum of the continuously compounded one-period returns.
 
 $$r_t[k]=ln(1+R_t[k])=ln[(1+R_t)(1+R_{t-1})\dots(1+R_{t-k+1})]$$
@@ -380,8 +391,7 @@ $$=ln(1+R_t)+ln(1+R_{t-1})+\dots +ln(1+R_{t-k+1})$$
 
 $$=r_t+r_{t-1}+\dots+r_{t-k+1}$$
 
-* Secondly, statistical properties of log returns are **tractable**.
-  * **Easy to calculate with**.
+* Secondly, statistical properties of log returns are **tractable**, easy to calculate with.
 
 ---
 class: middle
@@ -424,8 +434,7 @@ $$R_t= \frac{P_t+D_t}{P_{t-1}}-1 \; , \;r_t=ln(P_t+D_t)-ln(P_{t-1})$$
 class: middle
 
 ## Excess return
-.pull-left[]
-
+.pull-left[
 * Excess returns of an assets at time _t_ is the difference between the asset's return and the return on some reference asset.
 * The reference asset is often taken to be riskless such as a short-term UK government bond returns.
 * In portfolio performance analysis of actively managed funds a benchmark return is often used.
@@ -445,27 +454,34 @@ $$Z_t=R_t-R_{0t}, \; z_t=r_t-r_{0t}$$
 class:middle
 
 ## Examples
-.pull-left[
-**Excess return of the QSMF**
 
-![](QSMFactive.jpeg)
+.pull-left[
+
+.content-box-red[Simple return Vs Log returns]
+
+```{r, echo=FALSE}
+library(fpp2)
+library(tidyverse)
+glen %>%
+  select(date,simple_return,log_return) %>%
+  drop_na() %>%
+  pivot_longer(!date,names_to ="Return_Type",values_to="return") %>%
+  ggplot(aes(x=date,y=return)) +
+  geom_line() +
+  facet_wrap(~Return_Type,ncol = 1)
+  
+```
+
 ]
 .pull-right[
-Simple return Vs Log returns
-![](Glencore.jpeg)
-]
-
----
-class:middle
-
-## Simple return Vs log returns
-
-* Figure 1.2 shows a time plot of daily simple and log returns of Glencore stock from r first(glendate) to r last(glendate).
-* There are r sum(!is.na(glen$log_return)) observations.
+.discussion[
+* Plot shows a time plot of daily simple and log returns of Glencore stock from `r first(glen$date)` to `r last(glen$date)`.
+* There are `r sum(!is.na(glen$log_return))` observations.
 * From the plots, the behaviour of log returns is very similar to simple returns.
 * The correlation coefficient between log and simple returns is 0.9997.
 * This is expected, as when x is close to zero, $log(1+x) \approx x$ and daily simple returns of Glencore are small in the sampling period.
-
+]
+]
 ---
 class:middle
 
@@ -482,7 +498,6 @@ class:middle
 
 ## Inference from time plot of log returns
 
-  From figure 1.2:
 
   1. There exist some large outlying observations
   2. The returns were volatile in certain periods but stable in others.
@@ -578,6 +593,8 @@ class: middle
 $$
 \text{Discount yield }=\frac{F-P}{F}\times\frac{360}{\text{Days till maturity}}\times \text{100}
 $$
+---
+class:middle, inverse
 
 ## Treasury bills
 
@@ -589,18 +606,10 @@ $$
 |:--:|:---:|:---:|:---:|:---:|
 |12-3-98 |5.08 | 5.06 | -.03|5.26 
 
----
-middle: class
-
 ## Treasury bonds
 
 * T-Bonds have longer maturities (20-30 years).
 * They have a 6 month coupon payment and are commonly issued with maturities of 30 years.
-
-## Example: Daily T-Bill 3 month rate
-
-![](img/3MTB.png)
-
 
 ---
 class:middle
@@ -621,16 +630,6 @@ class:middle
 class: middle
 
 # The statistical forecasting perspective
-
-## Sample futures
-
-![](img/ftse_sims.png)
-
-## Forecast intervals
-
-![](img/ftse_intervals.png)
-
-## Statistical forecasting
 
 
 - Thing to be forecast: a random variable, $y_t$.

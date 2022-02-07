@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>FIN7028: Times Series Financial Econometrics 3</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Barry Quinn" />
+    <meta name="date" content="2022-02-07" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="../mycssblend.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# FIN7028: Times Series Financial Econometrics 3
+## Financial data stories
+### Barry Quinn
+### 2022-02-07
+
+---
+
+
+
+
+layout: true
+&lt;div class="my-footer"&gt;
+&lt;span&gt;
+&lt;a href="https://quinference.com" target="_blank"&gt;&lt;b&gt;quinference.com&lt;/b&gt;&lt;/a&gt; - Dr. Barry Quinn
+&lt;/span&gt;
+&lt;/div&gt; 
+---
+
+
+
+class: middle
+
+# Outline
+
+.large[
+- Financial data you have access to
+- WRDS set up
+- Asset returns
+]
+
+---
+class: middle
+
+## Wharton Research Data Services (WRDS)
+
+.large[What is WRDS?]
+
+.blockquote[
+Wharton Research Data Services (WRDS) provides the leading business intelligence, data analytics, and research platform to global institutions—enabling historical analysis and insight into the latest innovations in academic research.
+]
+
+.large[What is LSPD]
+
+.blockquote[
+The London Share Price Database (LSPD) is a unique, comprehensive database of UK stock returns covering over 9,000 UK shares from 1955 to date. It is an invaluable resource for both academic researchers and investment practitioners. The LSPD provides a record of total returns to investors, incorporating dividends and capital changes, and includes companies whether they have survived or died. This ensures that research, back testing and performance evaluation focuses on total shareholder return, and is untainted by **survivor bias**.
+]
+
+---
+class: middle
+
+## Learning objectives
+
+.large[
+- Become conversant in building and executing WRDS web queries
+- Understand survivor bias
+- Learning how to process financial data
+
+]
+
+---
+class: middle
+
+## What is WRDS?
+
+- WRDS stands for Wharton Research Data Services.  
+
+- WRDS aggregates data into a standard format and then makes it available to subscribers.
+
+- WRDS is best known for financial data—for example, stock prices from CRSP, or company fundamentals from Compustat.
+
+- WRDS also hosts data in a variety of other disciplines including:
+- .fatinline[Accouting, Banking, Management, Economics, Marketing, Healthcare, Insurance]
+
+---
+class: middle
+
+# Getting Started
+
+- All you need is a web browser and Internet access to query data from WRDS. 
+- After you decide which dataset to use, you can use the web-based query form to extract and output data in the format of your choice.
+
+- What follows provides instructions on how to create a web-based query. See Support for additional ways to access WRDS data.
+
+.blockquote[
+### Reproducible science skill
+
+In future labs and homework exercises we will be using one of the most powerful feature of WRDS; WRDS Cloud, to extract data programmatically.
+
+]
+
+---
+class: middle
+
+.your-turn[
+
+- Firstly create an account on WRDS using your QUB credentials
+
+- [Link to WRDS](https://wrds-www.wharton.upenn.edu)
+
+- Wait for lecturer to confirm your account
+]
+
+<div class="countdown" id="timer_62013ffe" style="right:0;bottom:0;" data-warnwhen="1">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: middle
+
+# Class assignment
+
+.your-turn[
+
+Iur assignment is to access WRDS and download monthly stock prices for IBM, Amazon, and Walmart for 2020. Stock price data is provided by CRSP. 
+
+This assignment has two parts:
+
+Log in to the WRDS platform and locate the CRSP database.
+
+Create a data query in CRSP and view the results.
+
+]
+<div class="countdown" id="timer_6201423e" style="right:0;bottom:0;" data-warnwhen="1">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+
+---
+class: middle
+
+# WRDS login page
+
+![](img/login.png)
+
+.large[
+- Enter your username and password
+- Click login button
+]
+---
+class:middle
+
+# WRDS Home Page
+
+.pull-left-1[
+- The WRDS Home page displays your data subscriptions.
+
+- Scroll down the page to locate the CRSP dataset.
+
+- Click on CRSP. 
+]
+.pull-right-2[
+![](img/data.png)
+]
+
+---
+class: middle
+
+## CRSP Page
+
+.pull-left[
+- Click on Stock/Security Files
+- Click on CRSP. 
+]
+.pull-right[
+![](img/crsp.png)
+]
+---
+class: middle
+
+# CRSP Stock/Security Files Page
+
+.pull-left-2[
+![](img/crsp1.png)
+]
+.pull-right-1[
+Click on monthly stock file
+]
+
+---
+class: middle
+
+## CRSP Monthly Stock Data Query
+
+.pull-left-1[
+- On the query page, the first step is to select the date range for your data. 
+
+- Enter 2020-01 to 2020-12 in the Date Variable fields. 
+]
+.pull-right-2[
+![](img/monthly.png)
+]
+
+---
+class: middle
+
+## Enter the Companies
+
+.pull-left-1[
+- Make sure ticker is selected
+- Enter the ticker symbols for the companies: IMB AMZN WMT
+
+]
+.pull-right-2[
+![](img/companies.png)
+]
+---
+class: middle
+
+## Select the Query Variables
+
+.pull-left-1[
+
+- Select the variables you want from the Query Variables list.
+- For this assignment, select two variables: Ticker and Price.
+
+]
+.pull-right-2[
+![](img/variables.png)
+]
+
+---
+class: middle
+
+# Select the Query Output
+
+![](img/output.png)
+
+- For this assignment, select fixed-width text (*.txt), which will display the data in your browser.
+
+---
+class: middle
+
+# Run the Query
+
+![](img/Run.png)
+
+- Click the Submit From button at the bottom of the page to run the query
+
+---
+class: middle
+
+# Query Summary
+
+.pull-left-2[
+![](img/query-summary.png)
+]
+.pull-right-1[
+
+- A summary page opens in a new tab, indicating the status of your query, and containing the link to your results.
+
+- **Success** means your data is ready. 
+
+- Click the Output files link to access the results of your query
+
+]
+
+---
+class: middle
+
+# Query Results
+
+.pull-left-1[
+![](img/results.png)
+]
+.pull-right-2[
+The monthly stock prices for IBM, Amazon, and Walmart for 2020 are displayed. 
+]
+
+---
+class: middle
+
+# Note: Pop-Up Blocker Installed?
+
+.pull-left-2[
+![](img/pop-up.png)
+]
+.pull-right-1[
+
+- If you have a pop-up blocker on your browser, the query page will show a banner indicating the query was submitted. 
+
+- Click the query number to proceed to the Summary screen, then click the link to access your results. 
+
+]
+
+---
+class: middle
+
+# Asset returns
+
+.discussion[
+- The most important financial time series are asset prices, exchange rates and interest rates.
+- Most financial studies involve returns rather than prices.
+- Campbell et al. (1997) gives two main reasons for using returns:
+1. For an average investor, returns of an asset is a complete and scale-free summary of the investment opportunity.
+2. Return series are easier to handle than price series because the former have more attractive statistical properties.
+]
+
+---
+class: middle
+
+## One-period simple returns 
+
+- Let _P~t~_ be the price of an asset at time index _t_ and assume the asset pays no dividend.
+  - **One-Period Simple Return**:
+  - Holding the asset for one period from date t-1 to date t would result in a _simple gross return_
+
+$$ 
+1+R_t= \frac{P_t}{P_{t-1}} \;or\; P_t=P_{t-1}(1+R_t)
+$$
+
+* The corresponding _simple net return_ or _simple return_ is:
+    
+$$
+R_t= \frac{P_t}{P_{t-1}}-1= \;or\; \frac{P_t-P_{t-1}}{P_{t-1}}
+$$
+
+---
+class:middle
+
+## Multiperiod simple returns 
+
+- Holding the asset for k period between dates t-k and t gives a k period simple gross return:
+
+`$$1+R_t[k] = \frac{P_t}{P_{t-k}}=\frac{P_t}{P_{t-1}}\times\frac{P_{t-1}}{P_{t-2}} \times \dots \times \frac{P_{t-k+1}}{P_{t-k}}$$`
+`$$=(1+R_t)(1+R_{t-1})\dots(1+R_{t-k+1})$$`
+`$$=\prod^{k-1}_{j=0}(1+R_{t-j})$$`
+
+- The _k_ period simple gross return is simply the product of the _k_ one-period simple gross returns; or the _compound return_.
+- The k-period simple net return is `\(R_t[k]= \frac{(P_t-P_{t-k})}{P_{t-k}}\)`
+
+---
+class: middle
+
+## Time interval
+* In practice, the actual time interval is important in discussing and comparing returns (e.g., monthly returns or annual returns).
+* If the time interval is not given, it is implicitly assumed to be one year.
+* If the asset is held for _k_ years, then the annualised (average) return is defined as:
+
+`$$\text{Annualised}\{R_t[k]\} = \left[\prod^{k-1}_{j=0}(1+R_{t-j})\right]^{1/k}-1$$`
+
+---
+class:middle
+
+## Time interval
+
+* As one-period returns tend to be small, a first-order Taylor expansion to approximate the annualised returns is:
+
+`$$\text{Annualised}\{R_t[k]\} \approx \frac{1}{k}\sum^{k-1}_{j=0}R_{t-j}$$`
+
+
+* Accuracy of this approximation may not be sufficient in some applications.
+
+---
+class:middle
+
+## Continuously compounded returns
+
+* The natural logarithm of the simple gross return of an asset is called the _continuously compounded return_ or _log return_
+
+$$
+r_t=ln(1+R_t)=ln \left(\frac{P_t}{P_{t-1}} \right)=p_t-p_{t-1} \
+\text{where }p_t=ln(P_t)
+$$
+
+### Advantages
+* Firstly, continuously compounded multiperiod return is simply the sum of the continuously compounded one-period returns.
+
+`$$r_t[k]=ln(1+R_t[k])=ln[(1+R_t)(1+R_{t-1})\dots(1+R_{t-k+1})]$$`
+
+`$$=ln(1+R_t)+ln(1+R_{t-1})+\dots +ln(1+R_{t-k+1})$$`
+
+`$$=r_t+r_{t-1}+\dots+r_{t-k+1}$$`
+
+* Secondly, statistical properties of log returns are **tractable**, easy to calculate with.
+
+---
+class: middle
+
+## Portfolio returns
+
+* The simple net return of a portfolio consisting of _N_ assets is a weighted average of the simple net returns of the assets involved, where the weight on each asset is the percentage of the portfolio's value invested in that asset.
+
+* Let _p_ be a portfolio that places weights _w~i~_ on asset _i_.  
+
+* Then the simple return of _p_ at time _t_ is:
+
+`$$R_{p,t}=\sum_{i=1}^{N}w_iR_{it}\text{ where}\sum w_i=1$$`
+
+---
+class: middle
+
+## Portfolio returns
+
+* log returns of a portfolio do not have this additive property, but if the simple returns _R~it~_ are all small in magnitude then we have:
+
+`$$r_{p,t} \approx \sum_{i=1}^{N}w_ir_{it}$$`
+
+* `\(r_{p,t}\)` is the continuously compounded return of the portfolio.
+* This approximation is usually used to study portfolio returns.
+
+---
+class:middle
+
+## Dividend payment
+
+* Asset returns must be modified if there is a periodic dividend
+* Let _D~t~_ be the dividend of an asset between dates _t-1_ and _t_, the simple net return and continuously compounded return at time t become:
+
+`$$R_t= \frac{P_t+D_t}{P_{t-1}}-1 \; , \;r_t=ln(P_t+D_t)-ln(P_{t-1})$$`
+
+* This adjustment is commonly referred to as a *total return*.
+
+---
+class: middle
+
+## Excess return
+.pull-left[
+* Excess returns of an assets at time _t_ is the difference between the asset's return and the return on some reference asset.
+* The reference asset is often taken to be riskless such as a short-term UK government bond returns.
+* In portfolio performance analysis of actively managed funds a benchmark return is often used.
+* Queens Student Managed Fund (QSMF) is benchmarked against the FTSE 350 Index.
+]
+.pull-right[
+* The simple excess return and log excess return of an asset are then defined as: 
+
+`$$Z_t=R_t-R_{0t}, \; z_t=r_t-r_{0t}$$`
+
+* where _R~0t~_ and _r~0t~_ are the simple and log returns of the reference asset, respectively. 
+* In finance literature, the excess return is thought of as the payoff on an arbitrage portfolio that goes long in an asset and short in the reference assets with no net initial investment.
+* In portfolio analytics, active return is the excess return compared to the *passive* benchmark return.
+]
+
+---
+class:middle
+
+## Examples
+
+.pull-left[
+
+.content-box-red[Simple return Vs Log returns]
+
+![](04.fin_data_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+]
+.pull-right[
+.discussion[
+* Plot shows a time plot of daily simple and log returns of Glencore stock from 2011-05-19 to 2020-01-20.
+* There are 2179 observations.
+* From the plots, the behaviour of log returns is very similar to simple returns.
+* The correlation coefficient between log and simple returns is 0.9997.
+* This is expected, as when x is close to zero, `\(log(1+x) \approx x\)` and daily simple returns of Glencore are small in the sampling period.
+]
+]
+---
+class:middle
+
+## Financial Returns Characteristics
+
+* Daily log returns are simply the change series of log prices.
+* In `R`, a change series can easily be obtained by taking the *difference* of log prices `diff(log(price))`.
+* In Figure 1.2  the *adjusted* daily price is used as it accounts for stock splits.
+* In Figure 1.1 the total return calculations includes both stock splits and dividend income.
+
+
+---
+class:middle
+
+## Inference from time plot of log returns
+
+
+  1. There exist some large outlying observations
+  2. The returns were volatile in certain periods but stable in others.
+  We can thus infer:
+  
+  1. Statistically the returns have heavy tails
+  2. The returns series is characterised by *volatility clustering*
+
+---
+class:middle
+
+# Bond yields and prices
+
+.pull-left[
+### What is a Bond?
+
+  * A financial instrument which pays the face value (par value) to its holder at the time of maturity.
+  * Some bonds also pay interest periodically; *coupon payments*.
+  * Zero-coupons bonds do not pay periodic interest.
+  * Bond yield is the return recieved for holding a bond to maturity.
+]
+.pull-right[
+## Current yield
+
+  * The percentage return that the annual coupon payment provides the investor
+
+$$ 
+\text{Current Yield}_t = \frac{ \text{Annual Interest paid in dollars}}{\text{Market Price of the Bond}_t} \times 100%
+$$
+  
+* For a zero-coupon bond the yield is defined as:
+  
+$$
+\text{Current Yield}_t=\frac{ \text{Annual Interest paid in dollars}}{\text{Market Price of the Bond}_t}^{1/k}-1 \\
+\text{where }k\text{ denotes time to maturity in years}
+$$
+* The definition shows it is typically time dependent ($_t$ subscript) and does not include capital gains/losses.
+]
+
+---
+class: middle
+
+## Yield to maturity
+
+  * Considers the time value of money by equating the bond price to the present value of future payments.
+  * YTM is a more common way to measure bond investment.
+  * It's calculation is more complex and calibration is required to find an accurate approximation.
+
+## Yield to maturity  
+
+* Suppose that the bond holder will receive `\(k\)` payments between purchase and maturity then:
+  
+$$
+P=\frac{C_1}{1+y}+\frac{C_2}{(1+y)^2}+\dots+\frac{C_k+F}{(1+y)^k}
+$$
+
+
+* Where `\(P\)` is the price of the bond, `\(y\)` is YTM, `\(C_I\)` is the ith coupon payment, and `\(F\)` denotes face value.
+* From the above equation the price of the bond has an inverse relationship to the YTM.
+
+---
+class: middle
+
+## US government bonds
+
+* US government issues various bonds to finance its debts.
+* These include
+1. **Treasury Notes**
+2. **Treasury Bonds**
+3. **Treasury Bills**
+
+## Treasury notes
+
+* Treasury notes (T-Notes) mature in 1-10 years.
+* They have a coupon payment every 6 months and a face value of $1000
+* Notes are quoted on the secondary market at percantage of face value in thirty-seconds of a point.
+* For example a quote of 95:08 indicates it is trading at a discount \$(95+8/32) X 1000/100 = \$953.5
+* The 10-year note is the most frequently quoted in discussions of the US government bond market.
+
+
+---
+class: middle
+
+## Treasury bills
+
+* US government issues various bonds to finance its debts.
+* Treasury Bills (T-Bills) mature in one year or less.
+* They pay no interest prior to maturity.
+* They are sold at a *discount* of face value to create a positive yield to maturity.
+* The minimum purchase is $100.
+* The discount yield (%) of T-Bills is calculated via
+
+$$
+\text{Discount yield }=\frac{F-P}{F}\times\frac{360}{\text{Days till maturity}}\times \text{100}
+$$
+---
+class:middle, inverse
+
+## Treasury bills
+
+* Bills are quoted differently from notes and bonds, since bills do not pay an established interest rate.
+* The return on a bill is the difference betweeen the purchase and subsequent sale price, or when held to maturity, the face value paid by the Treasury.
+* Thus bills are quoted at a discount to face value, with the discount expressed as an annual rate based on a 360-day years,  for example:
+
+|ISSUE| BID |ASK| CHANGE| YIELD|
+|:--:|:---:|:---:|:---:|:---:|
+|12-3-98 |5.08 | 5.06 | -.03|5.26 
+
+## Treasury bonds
+
+* T-Bonds have longer maturities (20-30 years).
+* They have a 6 month coupon payment and are commonly issued with maturities of 30 years.
+
+---
+class:middle
+
+## Implied volatility
+
+* Stock options are financial contracts which give the holder the right to buy (**call option**) or sell (**put option**) a stock at a prespecified price (**strike price**) within a given time period.
+* Black-Scholes defines the price of an option as dependent on, the strike price, risk-free interest rate, current price and volatility of the stock.
+* In practice, the stock volatility is not observed but backed out of the Black-Scholes formula as an *implied volatility* using calibration.
+
+#### CBOE VIX index
+
+* The VIX index is the most well-known implied volatility.
+* It measures the US stock market's expectation of 30-day volatility *implied* by averaging prices of S&amp;P 500 index puts and calls over a wide range of strike prices.
+* It is often regarded as the market fear factor, and can openly be traded using VIX futures and options.
+
+---
+class: middle
+
+# The statistical forecasting perspective
+
+
+- Thing to be forecast: a random variable, `\(y_t\)`.
+- Forecast distributin: If `\({\cal I}\)` is all observations, then `\(y_{t} |{\cal I}\)` means `the random variable `\(y_{t}\)` given what we know in `\({\cal I}\)``
+- The point forecast: is the mean (or median) of `\(y_{t} |{\cal I}\)`
+- The Forecast variance: is `\(\text{var}[y_{t} |{\cal I}]\)`
+- A prediction interval or interval forecast is a range of values of `\(y_t\)` with high probability.
+- With time series, `\({y}_{t|t-1} = y_t | \{y_1,y_2,\dots,y_{t-1}\}\)`.
+- `\(\hat{y}_{T+h|T} =\text{E}[y_{T+h} | y_1,\dots,y_T]\)` (a `\(h\)`-step forecast taking account of all observations up to time `\(T\)`).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"self_contained": true,
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+(function(time) {
+  var d2 = function(number) {
+    return ('0' + number).slice(-2); // left-pad 0 to minutes/seconds
+  },
+
+  time_format = function(total) {
+    var secs = Math.abs(total) / 1000;
+    var h = Math.floor(secs / 3600);
+    var m = Math.floor(secs % 3600 / 60);
+    var s = Math.round(secs % 60);
+    var res = d2(m) + ':' + d2(s);
+    if (h > 0) res = h + ':' + res;
+    return res;  // [hh:]mm:ss
+  },
+
+  slide_number_div = function(i) {
+    return document.getElementsByClassName('remark-slide-number').item(i);
+  },
+
+  current_page_number = function(i) {
+    return slide_number_div(i).firstChild.textContent;  // text "i / N"
+  };
+
+  var timer = document.createElement('span'); timer.id = 'slide-time-left';
+  var time_left = time, k = slideshow.getCurrentSlideIndex(),
+      last_page_number = current_page_number(k);
+
+  setInterval(function() {
+    time_left = time_left - 1000;
+    timer.innerHTML = ' ' + time_format(time_left);
+    if (time_left < 0) timer.style.color = 'red';
+  }, 1000);
+
+  slide_number_div(k).appendChild(timer);
+
+  slideshow.on('showSlide', function(slide) {
+    var i = slide.getSlideIndex(), n = current_page_number(i);
+    // reset timer when a new slide is shown and the page number is changed
+    if (last_page_number !== n) {
+      time_left = time; last_page_number = n;
+      timer.innerHTML = ' ' + time_format(time); timer.style.color = null;
+    }
+    slide_number_div(i).appendChild(timer);
+  });
+})(150000);
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
