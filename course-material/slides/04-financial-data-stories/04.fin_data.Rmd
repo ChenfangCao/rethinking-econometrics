@@ -40,52 +40,268 @@ layout: true
 <div class="my-footer"><span>quinference.com</span></div>
 
 ---
----
 class: middle
-# Three challenges of statistics
 
--.acid[Generalising from sample to population]
--.acid[Generalising from treatment to control group]
--.acid[Generalising from observed measurement to the underlying construct of interest]
+# Outline
 
-.blockquote[All three challenges can be framed as problems of prediction
-`r tufte::quote_footer("Vehtari,Gelman and Hill, 2021")`(hereafter ROS)]
-
----
-class: middle
-# Weapon of choice in social science
-
-.glow[regression]
-
-.blockquote[ Regression is a method that allows researchers to summarisze how predictions or average values of an *outcome* vary across individuals defined by a set of predictors]
-
-.acidline[
-- Prediction: *Predicting victory or defeat in a sport contest*
-- Exploring association: *Summarising how well one variable, or set of variables, predicts outcomes, for example risk factor modelling in asset pricing*
-- Extrapolation: *Adjusting for known differences between the sample (observed data) and a population of interest*
-- Causal inference: *The most important use: estimating treatment effects by comparing outcomes under treatment and control*
+.large[
+- Financial data you have access to
+- WRDS set up
+- Asset returns
 ]
 
-.blockquote[A key challenge for causal inference is ensuring that treatment and control groups are similar, on average, before exposure to the treatment, or else adjusting for differences between groups- ROS ]
+---
+class: middle
+
+## Wharton Research Data Services (WRDS)
+
+.large[What is WRDS?]
+
+.blockquote[
+Wharton Research Data Services (WRDS) provides the leading business intelligence, data analytics, and research platform to global institutions—enabling historical analysis and insight into the latest innovations in academic research.
+]
+
+.large[What is LSPD]
+
+.blockquote[
+The London Share Price Database (LSPD) is a unique, comprehensive database of UK stock returns covering over 9,000 UK shares from 1955 to date. It is an invaluable resource for both academic researchers and investment practitioners. The LSPD provides a record of total returns to investors, incorporating dividends and capital changes, and includes companies whether they have survived or died. This ensures that research, back testing and performance evaluation focuses on total shareholder return, and is untainted by **survivor bias**.
+]
 
 ---
 class: middle
-## Simple example of regression
 
-.panelset[
-.panel[.panel-name[Beauty and teaching evaluations]
-```{r}
-library(rosdata)
-rosdata::beauty %>%
-  select(eval,beauty) %>%
-  ggplot(aes(y=beauty,x=eval)) +
-  geom_point() +
-  geom_smooth(method = "lm",se=FALSE)
-```
+## Learning objectives
+
+.large[
+- Become conversant in building and executing WRDS web queries
+- Understand survivor bias
+- Learning how to process financial data
 
 ]
 
+---
+class: middle
+
+## What is WRDS?
+
+- WRDS stands for Wharton Research Data Services.  
+
+- WRDS aggregates data into a standard format and then makes it available to subscribers.
+
+- WRDS is best known for financial data—for example, stock prices from CRSP, or company fundamentals from Compustat.
+
+- WRDS also hosts data in a variety of other disciplines including:
+- fatinline[Accouting, Banking, Management, Economics, Marketing, Healthcare, Insurance]
+
+---
+class: middle
+
+# Getting Started
+
+- All you need is a web browser and Internet access to query data from WRDS. 
+- After you decide which dataset to use, you can use the web-based query form to extract and output data in the format of your choice.
+
+- What follows provides instructions on how to create a web-based query. See Support for additional ways to access WRDS data.
+
+.blockquote[
+### Reproducible science skill
+
+In future labs and homework exercises we will be using one of the most powerful feature of WRDS; WRDS Cloud, to extract data programmatically.
+
+]
+
+---
+class: middle
+
+.your-turn[
+
+- Firstly create an account on WRDS using your QUB credentials
+
+- [Link to WRDS](https://wrds-www-wharton.upenn.edu)
+
+- Wait for lecturer to confirm your account
+]
+
+---
+class: middle
+
+# Class assignment
+
+.your-turn[
+- our assignment is to access WRDS and download monthly stock prices for IBM, Amazon, and Walmart for 2020. Stock price data is provided by CRSP. 
+
+This assignment has two parts:
+
+Log in to the WRDS platform and locate the CRSP database.
+
+Create a data query in CRSP and view the results.
+
+]
+---
+class: middle
+
+# WRDS login page
+
+![](img/login.png)
+
+.large[
+- Enter your username and password
+- Click login button
+]
+---
 class:middle
+
+# WRDS Home Page
+
+.pull-left-1[
+- The WRDS Home page displays your data subscriptions.
+
+- Scroll down the page to locate the CRSP dataset.
+
+- Click on CRSP. 
+]
+.pull-right-2[
+![](img/data.png)
+]
+
+---
+class: middle
+
+# CRSP Page
+
+.pull-left-1[
+- Click on Stock/Security Files
+
+- Click on CRSP. 
+]
+.pull-right-2[
+![](img/crsp.png)
+]
+---
+class: middel
+
+CRSP Stock/Security Files Page
+
+.pull-left-2[
+![](img/crsp1.png)
+]
+.pull-right-1[
+Click on monthly stock file
+]
+
+---
+class: middle
+
+## CRSP Monthly Stock Data Query
+
+.pull-left-1[
+- On the query page, the first step is to select the date range for your data. 
+
+- Enter 2020-01 to 2020-12 in the Date Variable fields. 
+]
+.pull-right-2[
+![](img/monthly.png)
+]
+
+---
+class: middle
+
+---
+class: middle
+
+## Enter the Companies
+
+.pull-left-1[
+- Make sure ticker is selected
+
+- Enter the ticker symbols for the companies: IMB AMZN WMT
+
+]
+.pull-right-2[
+![](img/companies.png)
+---
+class: middle
+
+# Select the Query Variables
+
+.pull-left-1[
+- Select the variables you want from the Query Variables list.
+
+- For this assignment, select two variables: Ticker and Price.
+
+]
+.pull-right-2[
+![](img/variables.png)
+
+---
+class: middle
+
+# Select the Query Output
+
+![](img/output.png)
+
+- For this assignment, select fixed-width text (*.txt), which will display the data in your browser.
+
+---
+class: middle
+
+# Run the Query
+
+![](img/Run.png)
+
+- Click the Submit From button at the bottom of the page to run the query
+
+---
+class: middle
+
+# Query Summary
+
+.pull-left-2[
+![](img/query-summary.png)
+]
+.pull-right-1[
+
+- A summary page opens in a new tab, indicating the status of your query, and containing the link to your results.
+
+- **Success** means your data is ready. 
+
+- Click the Output files link to access the results of your query
+
+]
+
+---
+class: middle
+
+# Query Results
+
+.pull-left[
+![](img/results.png)
+]
+.pull-right[
+.large[
+The monthly stock prices for IBM, Amazon, and Walmart for 2020 are displayed. 
+]
+]
+
+---
+class: middle
+
+# Note: Pop-Up Blocker Installed?
+
+.pull-left-2[
+![](img/pop-up.png)
+]
+.pull-right-1[
+
+- If you have a pop-up blocker on your browser, the query page will show a banner indicating the query was submitted. 
+
+- Click the query number to proceed to the Summary screen, then click the link to access your results. 
+
+]
+
+
+---
+class: middle
 
 # Asset returns
 
