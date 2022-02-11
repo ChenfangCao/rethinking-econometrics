@@ -102,18 +102,17 @@ y <- ts(z, frequency=12, start=c(2003, 1))
 
 ### `ts(data, frequency, start)`
 
-\begin{tabular}{lrl}
-\bf Type of data & \hspace*{1.95cm}\bf frequency                 & \bf start example\hspace*{0.25cm} \\
-\midrule
-Annual    & 1 & 1995\\
-Quarterly & 4 & c(1995,2)\\
-Monthly   & 12  & c(1995,9)\\
-Daily     & 7 \emph{or} 365.25  & 1 \emph{or} c(1995,234) \\
-Weekly    & 52.18  & c(1995,23)\\
-Hourly    & 24 \emph{or} 168 \emph{or} 8,766  & 1 \\
-Half-hourly  & 48 \emph{or} 336 \emph{or} 17,532 & 1 \\
-\end{tabular}
-
+####Type of data 
+|frequency|start|example|
+|:--:|:--:|:--:|
+|Annual|1 |1995|
+|Quarterly|4|`c(1995,2)`|
+|Monthly|12|`c(1995,9)`|
+|Daily|7 or 365.25|  1 or c(1995,234)|
+|Weekly| 52.18| c(1995,23)|
+|Hourly|24 or 168 or 8,766  | 1|
+|Half-hourly|48 or 336 or 17,532 | 1|
+  
 ---
 class: middle
 
