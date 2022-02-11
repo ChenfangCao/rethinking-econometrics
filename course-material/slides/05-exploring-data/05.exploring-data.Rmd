@@ -1,5 +1,5 @@
 ---
-title: "FIN7028: Times Series Financial Econometrics 3" 
+title: "FIN7028: Times Series Financial Econometrics 5" 
 subtitle: "Exploring data"
 author: "Barry Quinn"
 date: "`r Sys.Date()`"
@@ -34,13 +34,14 @@ library(tidyverse)
 library(tidyquant)
 library(knitr)
 library(kableExtra)
+library(DT)
 style_mono_accent(
   base_color = "#1c5253",
   header_font_google = google_font("Josefin Sans"),
   text_font_google   = google_font("Montserrat", "300", "300i"),
   code_font_google   = google_font("Fira Mono")
   )
-load("~/Dropbox/Teaching/TSFE/data/fin7028_dat.RData")
+library(tsfe)
 ```
 
 .acid[
@@ -120,11 +121,15 @@ class: middle
 
 ![](https://youtu.be/woxJZTL2hok)
 
-## Class package (pre-loaded in Q-RaP)
+---
+class: middle
 
-`library(tidyverse)
-library(tidyquant)
-`
+## Class package (pre-loaded in Q-RaP)
+.pull-left[
+`library(tidyverse); library(tidyquant); library(DT)`
+
+`DT` loads **datatable** interactive table visualisation
+
 `tidyquant` loads:
 
 * **tq_get** function (for getting data from online sources)
@@ -133,10 +138,10 @@ library(tidyquant)
 
 `tidyverse` loads many packages include:
 
-  * **ggplot** plotting package
-  * **dplyr** data wrangling package
-  
-## Class package
+* **ggplot** plotting package
+* **dplyr** data wrangling package
+]  
+.pull-right[
 ```
 library(fpp2)
 ```
@@ -145,20 +150,19 @@ This loads:
 * **forecast** package (for forecasting functions)
 * **fma** package (for lots of time series data)
 * **expsmooth** package (for more time series data)
+]
 
 ---
 class: middle
 
-## Class data
-
-\fontsize{10}{14}\sf
+## Some class data
 
 ```{r loaddata,eval=F,echo=T}
 MyDeleteItems<-ls() 
 rm(list=MyDeleteItems) 
 # Good practice to clear all objects before loading data
-load(url("http://www.barryquinn.com/data/fin7028_dat.RData"))
-ls()
+library(tsfe) # includes class datasets
+data(package='tsfe')
 ```
 
 
@@ -167,8 +171,10 @@ class: middle
 
 ## Programmatically accessing data from the `r fa(name = 'cloud',fill = 'lightblue')`
 
+pull-left[
+* Using WRDS (more later)
 * Download data using `tg_get`
-  * Create a monthly series using `tq_transmute`
+* Create a monthly series using `tq_transmute`
 
 ```{r, echo=TRUE,eval=FALSE}
 ftse<-tq_get("^FTSE",from="2016-01-01")
@@ -177,67 +183,69 @@ ftse_m<-tq_transmute(ftse,
                      mutate_fun = to.monthly)
 ftse_m_ts<-ts(ftse_m$adjusted, start=c(2016,1), freq=12)
 ```
+]
+pull-right[
 
-## UK Stock market time series
-
-`ts` object has plotting functionality.
+- `ts` object has plotting functionality.
+- Quick visualisation of financial time trends in monthly ftse 100 index price
 
 ```{r, echo=TRUE, fig.height=5}
-autoplot(ftse_m_ts) + theme_tq()
+autoplot(tsfe::ftse_m_ts) + theme_tq()
 ```
 
+]
 
 ---
 class: middle
 
-## Quarterly earnings time series
-\fontsize{10}{14}\sf
+## Is a table a good visualisation?
 
-`ts` object have print functionality.
+- Quarterly earnings per share data for carnival PLC.
+
+- Using `DT` to create an interactive table
 
 ```{r echo=TRUE}
-carnival_eps_ts
+tsfe::carnival_eps_ts 
+
 ```
+
+---
+class: middle
 
 ## rethinking visualisation using `ggplot2` 
 
-  * `ggplot2` is based on [The Grammar of Graphics](http://amzn.to/2ef1eWp), the idea
-that you can build every graph from the same
-components: a data set, a coordinate system,
-and geoms—visual marks that represent data points.
+* `ggplot2` is based on [The Grammar of Graphics](http://amzn.to/2ef1eWp), the idea that you can build every graph from the same
+components: a data set, a coordinate system, and geoms—visual marks that represent data points.
 
-\includegraphics{ggplot2}
 
 ## Example: Exchange rate time series
 
-\small
-
-```{r echo=TRUE, eval= F}
+```{r echo=TRUE, eval= T}
 usuk_rate %>%  # Data
   ggplot(aes(x=date, y=price )) + # Coordinate system
   geom_line(colour="pink") # geom
 ```
 
 
-## Exchange rate time series
+---
+class: middle
 
-\includegraphics{cable.png}
-
-## Your turn
-
+.your-turn[
 * Use `tq_get` to download the CBOE VIX Index from `2016-01-01` using the symbol `^VIX`
 * create a time series object using the VIX index price.
 * Plot this daily VIX Index Price using `autoplot`.
 
-\bigskip
+**Hint:** the ts object of daily financial time series does not have a regular frequency to input into `ts()` function, so leave this argument blank.
+]
 
-  **Hint:** the ts object of daily financial time series does not have a regular frequency to input into `ts()` function, so leave this argument blank.
+---
+class: middle
 
 # Distributions properties of asset returns
 
 ## Why normal?
 
-* This is a plot of a normal distrubtion with mean equal to zero and variance equal to one.
+* This is a plot of a normal distribution with mean equal to zero and variance equal to one.
 
 ```{r normalplot, echo=FALSE,out.height="70%",fig.align="center"}
 require(grDevices) 
@@ -254,26 +262,35 @@ ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
   theme(plot.title = element_text(hjust = 0.5,size=20))
 ```
 
+---
+class: middle
+
 ## Why normal?
 
 * Named after Carolo Friderico Gavss, the normal (or Gaussian) distribution is the most common used distributional assumption in statistical analysis.
 
-\textbf{This is because:}
+.large[This is because:]
 
 * Easy to calculate with
 * Common in nature
 * Very conservative assumptions
 
-## Why normal?
+---
+class: middle
 
+.discussion[
 * Suppose 100 students lined up on the midfield line of a soccer pitch.
 * Each student flips a fair coin
 * Heads they take 1 step to the left
 * Tails they take 1 step to the right
 * Each student repeats this process 16 times
 * What would the the distribution of the position of the students look like after 16 steps?
+]
 
-## Why normal?
+---
+class: middle
+
+## Simulation some fake data on this thought experiment
 
 \includegraphics{RW.png}
 
