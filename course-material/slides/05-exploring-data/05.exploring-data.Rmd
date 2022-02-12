@@ -48,6 +48,8 @@ library(tsfe)
 .hand[Learning Outcomes]
 - Visualise arguments with data
 - Access data programmatically
+- Fake data, simulation and uncertainty
+- Statistically engineered robots in finance
 - Visual trends and patterns
 - Criticise poor visualisations
 ]
@@ -221,7 +223,7 @@ components: a data set, a coordinate system, and geoms—visual marks that repre
 ## Example: Exchange rate time series
 
 ```{r echo=TRUE, eval= T}
-usuk_rate %>%  # Data
+tsfe::usuk_rate %>%  # Data
   ggplot(aes(x=date, y=price )) + # Coordinate system
   geom_line(colour="pink") # geom
 ```
@@ -279,47 +281,88 @@ class: middle
 class: middle
 
 .discussion[
-* Suppose 100 students lined up on the midfield line of a soccer pitch.
-* Each student flips a fair coin
-* Heads they take 1 step to the left
-* Tails they take 1 step to the right
-* Each student repeats this process 16 times
-* What would the the distribution of the position of the students look like after 16 steps?
+* Suppose your company is being IPO'd at a starting price of £40.
+* You want to know the future price of the stock in 200 days.
+* You have been told Monte Carlo simulation can help predict stock market futures
+* Can you create a number of possible future price paths and find average price in 200 days?
+* How many futures should you create? 
+* What assumptions should we make about these futures
 ]
 
 ---
 class: middle
 
-## Simulation some fake data on this thought experiment
+.your-turn[
+## Your first monte carlo simulation
+```{r}
+number_of_possible_futures=10000
+generate.path <- function(){
+  days <- 200
+  changes <- rnorm(200,mean=1.001,sd=0.005)
+  sample.path <- cumprod(c(40,changes))
+  closing.price <- sample.path[days+1] #+1 because we add the opening price
+  return(closing.price)
+}
+mc.closing <- replicate(number_of_possible_futures,generate.path())
+cat("Median of possible futures =",paste0("£",round(median(mc.closing),3)))
+```
+]
 
-\includegraphics{RW.png}
+
+---
+class: middle 
 
 ## Why normal?
+pull-left[
 
+.fatinline[Practical reasons]
 * Processes that produce normal distributions include:
   * Addition
 * Lots of process are approximately normal
   * Product of small deviations
   * logarithms of products
   * Logarithms are just magnitudes
+]
+]
 
-<!-- ## Why normal? -->
+---
+class: middle
 
-<!-- * Ontological perspective -->
-<!-- * Processes which add fluctuations results in dampening -->
-<!-- * Damped fluctuations end up Gaussian -->
-<!-- * No information left, except mean and variance. -->
-<!-- * Can't infer process from distribution!  Most do some more science. -->
-  
-## Why normal?
+.fat[Ontological perspective of why normal?]
 
-<!-- * Epistemological perspective -->
+pull-left[
+<iframe width="560" height="315" src="https://www.youtube.com/embed/XTsaZWzVJ4c" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+]
+
+.pull-right[
+
+* Processes which add fluctuations results in dampening
+* Damped fluctuations end up Gaussian
+* No information left, except mean and variance.
+* Can't infer process from distribution!  Most do some more science.
+]  
+
+---
+class: middle
+
+.acid[Epistemological perspective of why normal?]
+
+pull-left[
+<iframe width="560" height="315" src="https://www.youtube.com/embed/lI9-YgSzsEQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+]
+
+pull-right[
 * Know only *mean* and *variance*
 * Then least suprising and most conservative (*maximum entropy*) distribution is Gaussian.
   * In terms of being conservative, it assumes the least; only the mean and variance. 
 * Nature likes maximum entropy distributions.
+]
 
+---
+class: middle
 
+pull-left[
 ## Why normal asset returns?
 * Financial time series processes considered in this course:
 * Return series
@@ -327,7 +370,8 @@ class: middle
 * Volatility processes
 * Extreme events
 * Multivariate series
-  
+  ]
+  pull-right[
 ## Why assume normal asset returns?
 * Normality assumption allows for asset returns properties to be tractable.
 * Tractable mean and variance
@@ -336,44 +380,47 @@ class: middle
   * Symmetry has important implications in holding short and long financial positions in risk management.
 * Tractable kurtosis properties 
   * Kurtosis is related to volatility forecasting, efficiency in estimation and tests,etc.
+]
+
+---
+class: middle
 
 ## Our first engineered robot
-
+pull-left[
 * To engineer a statistical model of asset returns we need to make some assumptions about the data story or *data generating process*.
 
 $$ \{R_{it}|i-1,\dots N;t=1,\dots,T\} \stackrel{i.i.d}\sim N (m_1,m_2) $$
 
-\bigskip
-
 * A traditional assumption in financial analysis is the simple returns are independently and identically distributed (iid) as normal with a fixed mean $m_1$ and variance $m_2$.
 
-## Our first engineered robot
-
+.pull-right.discussion[
 * The previous assumption is unrealistic in a number of ways:
 1. The lower bound of a simple return is -1, but a normal distribution has no lower bound.
 2. Multiperiod simple returns $R_it[k]$ is not normally distributed as it is the *product* of one-period returns.
 3. Empirically, asset returns tend  to have *heavy tails* or **positive excess kurtosis**
-  
+]
+
+--class
 ## Our second statistical robot: \small{lognormal distribution}
 
 $$ \{r_{it}|i=1,\dots N ;t=1,\dots,T\} \stackrel{i.i.d}\sim N (\mu,\sigma^2) $$
-
-\bigskip
 
 * Another common assumption is that log returns are iid as normal with mean $\mu$ and variance $\sigma^2$.
 * As the sum of a finite number of iid random variables is normal, $r_t[k]$ is also normally distributed.
 * There is also no lower bound for $r_t$
 * However, lognormal assumption is not consistent with **positive excess kurtosis**.
 
+---
+class: middle
+
 # Empirical properties of log returns
 
 ## Are stock returns distributed normally?
 
-\small
-
 * The following code loads Glencore Plc asset prices from yahoo finance, converts daily adjusted prices to monthly log returns, and creates a monthly time series object.
 
-### Ugly code
+.pull.left[
+.fancy[Ugly code]
 
 ```{r,echo=T,eval=FALSE}
 glen <- tq_get("GLEN.L")
@@ -385,9 +432,10 @@ glen_m <- tq_transmute(glen,
 glen_m_ts <- ts(glen_m$log_return,
                 frequency=12,start=c(2011,5))
 ```
-
-## Piping (%>%) code better?
-### Prettier code
+]
+.pull-right[
+.fancy[Piping (%>%) code is more readable?]
+- `literate programming`
 ```{r,echo=T,eval=FALSE}
 glen <- tq_get("GLEN.L")
 glen_m <- glen %>%
@@ -398,10 +446,15 @@ glen_m <- glen %>%
 glen_m_ts <- glen_m$log_return %>%
   ts(frequency=12,start=c(2011,5))
 ```
+]
+
+
+---
+class: middle
 
 ## Are stock returns distributed normally?
 
-  **Visual Evidence**
+**Visual Arguments**
 
   * We can use `ggplot` to visualise the empirical distribution, superimposing what the returns would look like if they were normally distributed.
 
@@ -420,15 +473,10 @@ glen_m %>%
     col="red")
 ```
 
-## Are stock returns distributed normally?
-
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{glen_dist.png}
 
 ## Inference
 
   * **What patterns are revealed?**
-
-\bigskip
 
   * The normal distribution is superimposed over the histogram of the daily equity returns.
   * Compared to the normal the distribution of the returns has longer tails and a higher central peak.
@@ -437,7 +485,7 @@ glen_m %>%
 ## Are stock returns distributed normally?
   
 ```{r qqplot,echo=FALSE}
-glen_m %>%
+tsfe::glen_m %>%
   ggplot(aes(sample=100*log_return)) +
   stat_qq(distribution = stats::qnorm) +
   stat_qq_line(distribution = stats::qnorm,
