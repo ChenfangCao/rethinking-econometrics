@@ -1,0 +1,71 @@
+---
+title: "exercise"
+author: "Barry Quinn"
+date: "13/02/2022"
+output: html_document
+---
+
+## Learning outcomes
+
+We have introduced the following graphics functions:
+
+  - `gglagplot`
+  - `ggAcf`
+
+Explore the following time series using these functions. Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
+
+  - `ni_hsales_ts`
+  - `vix_ts`
+  - `ftse_m_ts`
+
+## Which is which?
+
+```{r, fig.height=6, fig.width=12, echo=FALSE, warning=FALSE, out.width="11.5cm"}
+tp1 <- autoplot(ni_hsales_ts) + xlab("") + ylab("Total Verified Sales") +
+  ggtitle("1. NI house sales")
+tp2 <- autoplot(vix_ts) + xlab("") + ylab("") +
+  ggtitle("2. VIX prices")
+tp3 <- autoplot(ftse_m_ts) + xlab("") + ylab("") +
+  ggtitle("3. FTSE 100 log returns")
+acfa <- ggAcf(ni_hsales_ts, ci=0) + xlab("") + ggtitle("A") + ylim(-0.4,1)
+acfb <- ggAcf(vix_ts, ci=0) + xlab("") + ggtitle("B") + ylim(-0.4,1)
+acfc <- ggAcf(ftse_m_ts, ci=0) + xlab("") + ggtitle("C") + ylim(-0.4,1)
+gridExtra::grid.arrange(tp1,tp2,tp3,
+                        acfc,acfb,acfa,nrow=2)
+```
+
+## Your turn
+  - load `fin7028_dat.RData` from canvas
+
+We have introduced the following graphics functions:
+
+  - `gglagplot`
+  - `ggAcf`
+
+Explore the following time series using these functions. Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
+
+  - `ni_hsales_ts`
+  - `vix_ts`
+  - `ftse_ts`
+
+## Which is which?
+
+```{r, fig.height=6, fig.width=12, echo=FALSE, warning=FALSE, out.width="11.5cm"}
+tp1 <- autoplot(ni_hsales_ts) + xlab("") + ylab("Total Verified Sales") +
+  ggtitle("1. NI house sales")
+tp2 <- autoplot(vix_ts) + xlab("") + ylab("") +
+  ggtitle("2. VIX prices")
+tp3 <- autoplot(ftse_m_ts) + xlab("") + ylab("") +
+  ggtitle("3. FTSE 100 log returns")
+acfa <- ggAcf(ni_hsales_ts, ci=0) + xlab("") + ggtitle("A") + ylim(-0.4,1)
+acfb <- ggAcf(vix_ts, ci=0) + xlab("") + ggtitle("B") + ylim(-0.4,1)
+acfc <- ggAcf(ftse_m_ts, ci=0) + xlab("") + ggtitle("C") + ylim(-0.4,1)
+gridExtra::grid.arrange(tp1,tp2,tp3,
+                        acfc,acfb,acfa,nrow=2)
+```
+
+## Which is which?
+
+1. NI house sales is A ACF plot
+2. VIX prices is B ACF plot
+3. FTSE 100 log returns is C ACF plot

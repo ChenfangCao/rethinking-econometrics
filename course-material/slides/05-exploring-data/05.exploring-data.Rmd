@@ -42,6 +42,7 @@ style_mono_accent(
   code_font_google   = google_font("Fira Mono")
   )
 library(tsfe)
+use_panelset()
 ```
 
 .acid[
@@ -57,14 +58,13 @@ library(tsfe)
 ---
 class: middle
 
-# Time series in R
-
-## Rethinking visualisation
-
+# Rethinking visualisation
+.fat[
   - Charts are not meant to be *seen*, they are intended to be *read*
   - They are not just images but **visual arguments**.
   - Data doesn't *speak for itself*.
   - Data visualisations need to be **shown** and **explained**
+]
 
 ---
 class: middle
@@ -93,6 +93,8 @@ class: middle
 
 ## `ts` objects and `ts` function
 
+.pull-left[
+
 For observations that are more frequent than once per year, add a `frequency` argument.
 
 E.g., monthly data stored as a numerical vector `z`:
@@ -100,10 +102,10 @@ E.g., monthly data stored as a numerical vector `z`:
 ```r
 y <- ts(z, frequency=12, start=c(2003, 1))
 ```
+]
+.pull-right[
 
-## `ts` objects and `ts` function
-
-### `ts(data, frequency, start)`
+`ts(data, frequency, start)`
 
 ####Type of data 
 |frequency|start|example|
@@ -115,13 +117,7 @@ y <- ts(z, frequency=12, start=c(2003, 1))
 |Weekly| 52.18| c(1995,23)|
 |Hourly|24 or 168 or 8,766  | 1|
 |Half-hourly|48 or 336 or 17,532 | 1|
-  
----
-class: middle
-
-## Tidyquant package
-
-![](https://youtu.be/woxJZTL2hok)
+  ]
 
 ---
 class: middle
@@ -173,7 +169,7 @@ class: middle
 
 ## Programmatically accessing data from the `r fa(name = 'cloud',fill = 'lightblue')`
 
-pull-left[
+.pull-left[
 * Using WRDS (more later)
 * Download data using `tg_get`
 * Create a monthly series using `tq_transmute`
@@ -186,12 +182,12 @@ ftse_m<-tq_transmute(ftse,
 ftse_m_ts<-ts(ftse_m$adjusted, start=c(2016,1), freq=12)
 ```
 ]
-pull-right[
 
+.pull-right[
 - `ts` object has plotting functionality.
 - Quick visualisation of financial time trends in monthly ftse 100 index price
 
-```{r, echo=TRUE, fig.height=5}
+```{r, echo=TRUE, fig.height=3}
 autoplot(tsfe::ftse_m_ts) + theme_tq()
 ```
 
@@ -207,27 +203,29 @@ class: middle
 - Using `DT` to create an interactive table
 
 ```{r echo=TRUE}
-tsfe::carnival_eps_ts 
-
+tsfe::ni_hsales %>% datatable()
 ```
 
 ---
 class: middle
 
-## rethinking visualisation using `ggplot2` 
+## Rethinking visualisation using `ggplot2` 
+
+.pull-left[
 
 * `ggplot2` is based on [The Grammar of Graphics](http://amzn.to/2ef1eWp), the idea that you can build every graph from the same
 components: a data set, a coordinate system, and geoms—visual marks that represent data points.
 
+]
+.pull-right[
+#### Example: Exchange rate time series
 
-## Example: Exchange rate time series
-
-```{r echo=TRUE, eval= T}
+```{r echo=TRUE, eval= T, fig.height=4}
 tsfe::usuk_rate %>%  # Data
   ggplot(aes(x=date, y=price )) + # Coordinate system
   geom_line(colour="pink") # geom
 ```
-
+]
 
 ---
 class: middle
@@ -245,23 +243,23 @@ class: middle
 
 # Distributions properties of asset returns
 
-## Why normal?
+#### Why normal?
 
 * This is a plot of a normal distribution with mean equal to zero and variance equal to one.
 
-```{r normalplot, echo=FALSE,out.height="70%",fig.align="center"}
+```{r normalplot, echo=FALSE,fig.height=2,fig.align="center"}
 require(grDevices) 
 require(graphics)
 ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
   stat_function(fun = dnorm, 
                 n = 101, 
                 args = list(mean = 0, sd =1)
-                ,lwd=2,colour="red") + 
+                ,lwd=1,colour="red") + 
   ylab("") +
   scale_y_continuous(breaks = NULL) +
   labs(title=expression(y[it] %~% N(0,1)),
        x=expression(y[it])) +
-  theme(plot.title = element_text(hjust = 0.5,size=20))
+  theme(plot.title = element_text(hjust = 0.5,size=8))
 ```
 
 ---
@@ -280,42 +278,120 @@ class: middle
 ---
 class: middle
 
-.discussion[
-* Suppose your company is being IPO'd at a starting price of £40.
-* You want to know the future price of the stock in 200 days.
-* You have been told Monte Carlo simulation can help predict stock market futures
-* Can you create a number of possible future price paths and find average price in 200 days?
-* How many futures should you create? 
-* What assumptions should we make about these futures
+## Rethinking econometrics: 
+### `the importance of simulation`
+
+- Simulation of random variables is important in applied statistics for several reasons. 
+- .larger[First], we use probability models to mimic variation in the world, and the tools of simulation can help us better
+understand how this variation plays out.
+
+.blockquote[
+Patterns of randomness are notoriously contrary to normal human thinking—our brains don’t seem to be able to do a good job understanding that random swings will be present in the short term but average out in the long run—and in many cases simulation is a big help in training our intuitions about averages and variation.
+`r tufte::quote_footer("Gelman et al. 2021")`
 ]
 
 ---
 class: middle
 
-.your-turn[
-## Your first monte carlo simulation
-```{r}
-number_of_possible_futures=10000
-generate.path <- function(){
+## Rethinking econometrics: 
+### `the importance of simulation`
+
+.large[
+- .Second, we can use simulation to approximate the sampling distribution of data and propagate this to the sampling distribution of statistical estimates and procedures. 
+
+- Third, regression models are not deterministic; they produce probabilistic predictions. 
+]
+
+---
+class: middle
+
+## Rethinking econometrics: `the importance of simulation`
+
+.large[
+- Simulation is the most convenient and general way to represent uncertainties in forecasts. 
+
+Throughout this course and in our practice, we use simulation for all these reasons; 
+
+- In this lecture we introduce the basic ideas and the tools required to perform simulations in R.
+]
+
+---
+class: middle
+
+.discussion[
+* Suppose your company is being IPO'd at a starting price of £40.
+
+* You want to know the future price of the stock in 200 days.
+
+* You have been told Monte Carlo simulation can help predict stock market futures
+
+* Can you create a number of possible future price paths and find average price in 200 days?
+
+* How many futures should you create? 
+
+* What assumptions should we make about these futures?
+]
+
+---
+class: middle
+
+.salt[Simulation in `r fa(name="r-project")`]
+
+.panelset[
+.panel[
+.panel-name[custom-made R function]
+- The coding for simulation becomes cleaner if we express the steps for a single simulation in an `r fa(name="r-project",fill="blue")` function.
+
+```{r custom function}
+path_sim <- function(){
   days <- 200
   changes <- rnorm(200,mean=1.001,sd=0.005)
   sample.path <- cumprod(c(40,changes))
   closing.price <- sample.path[days+1] #+1 because we add the opening price
   return(closing.price)
 }
-mc.closing <- replicate(number_of_possible_futures,generate.path())
-cat("Median of possible futures =",paste0("£",round(median(mc.closing),3)))
 ```
 ]
+.panel[
+.panel-name[`replicate` function]
+- For simplicity I have *hard-coded* one sample path of our IPO closing price in the previous function.
+- We can then use replicate function to call `path_sim` 10000 times
 
+```{r}
+number_of_possible_futures=10000
+mc.closing <- replicate(number_of_possible_futures,path_sim())
+```
+
+]
+.panel[
+.panel-name[Summarising simulations]
+
+- Simulations are a versatile way to summarise a probability model, predictions from a fitted regression or uncertainty about parameters of a fitted model (*the probabilistic equivalent of estimates and standard errors*)
+- One useful way to summarise the *location* of the distribution is to use the `median` function in the variation in the distribution is the *median absolute deviation standard deviation (mad sd)*.
+]
+
+.panel[
+.panel-name[Median statistics]
+.blockquote[
+We typically prefer median-based summaries because they are more computationally stable, and we rescale the median-based summary of variation as described above so as to be comparable to the standard deviation, which we already know how to interpret in usual statistical practice.
+]
+```{r}
+cat("median = ",median(mc.closing),
+    "mad sd = ",mad(mc.closing),
+    "mean = ",mean(mc.closing),
+    "sd = ",sd(mc.closing))
+```
+]
+]
 
 ---
 class: middle 
 
 ## Why normal?
-pull-left[
 
-.fatinline[Practical reasons]
+
+.fat[
+Practical reasons
 * Processes that produce normal distributions include:
   * Addition
 * Lots of process are approximately normal
@@ -323,16 +399,14 @@ pull-left[
   * logarithms of products
   * Logarithms are just magnitudes
 ]
-]
 
 ---
 class: middle
 
 .fat[Ontological perspective of why normal?]
 
-pull-left[
+.pull-left[
 <iframe width="560" height="315" src="https://www.youtube.com/embed/XTsaZWzVJ4c" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
 ]
 
 .pull-right[
@@ -348,11 +422,11 @@ class: middle
 
 .acid[Epistemological perspective of why normal?]
 
-pull-left[
+.pull-left[
 <iframe width="560" height="315" src="https://www.youtube.com/embed/lI9-YgSzsEQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 ]
 
-pull-right[
+.pull-right[
 * Know only *mean* and *variance*
 * Then least suprising and most conservative (*maximum entropy*) distribution is Gaussian.
   * In terms of being conservative, it assumes the least; only the mean and variance. 
@@ -362,7 +436,7 @@ pull-right[
 ---
 class: middle
 
-pull-left[
+.pull-left[
 ## Why normal asset returns?
 * Financial time series processes considered in this course:
 * Return series
@@ -371,7 +445,8 @@ pull-left[
 * Extreme events
 * Multivariate series
   ]
-  pull-right[
+
+.pull-right[
 ## Why assume normal asset returns?
 * Normality assumption allows for asset returns properties to be tractable.
 * Tractable mean and variance
@@ -386,13 +461,14 @@ pull-left[
 class: middle
 
 ## Our first engineered robot
-pull-left[
+
+.pull-left[
 * To engineer a statistical model of asset returns we need to make some assumptions about the data story or *data generating process*.
 
 $$ \{R_{it}|i-1,\dots N;t=1,\dots,T\} \stackrel{i.i.d}\sim N (m_1,m_2) $$
 
 * A traditional assumption in financial analysis is the simple returns are independently and identically distributed (iid) as normal with a fixed mean $m_1$ and variance $m_2$.
-
+]
 .pull-right.discussion[
 * The previous assumption is unrealistic in a number of ways:
 1. The lower bound of a simple return is -1, but a normal distribution has no lower bound.
@@ -400,8 +476,10 @@ $$ \{R_{it}|i-1,\dots N;t=1,\dots,T\} \stackrel{i.i.d}\sim N (m_1,m_2) $$
 3. Empirically, asset returns tend  to have *heavy tails* or **positive excess kurtosis**
 ]
 
---class
-## Our second statistical robot: \small{lognormal distribution}
+---
+class: middle
+
+## Our second statistical robot: .small[lognormal distribution]
 
 $$ \{r_{it}|i=1,\dots N ;t=1,\dots,T\} \stackrel{i.i.d}\sim N (\mu,\sigma^2) $$
 
@@ -419,8 +497,9 @@ class: middle
 
 * The following code loads Glencore Plc asset prices from yahoo finance, converts daily adjusted prices to monthly log returns, and creates a monthly time series object.
 
-.pull.left[
-.fancy[Ugly code]
+.pull-left[
+
+.heatinline[Ugly code]
 
 ```{r,echo=T,eval=FALSE}
 glen <- tq_get("GLEN.L")
@@ -436,7 +515,7 @@ glen_m_ts <- ts(glen_m$log_return,
 .pull-right[
 .fancy[Piping (%>%) code is more readable?]
 - `literate programming`
-```{r,echo=T,eval=FALSE}
+```{r,echo=T,eval=T}
 glen <- tq_get("GLEN.L")
 glen_m <- glen %>%
   tq_transmute(select = adjusted,
@@ -452,16 +531,19 @@ glen_m_ts <- glen_m$log_return %>%
 ---
 class: middle
 
+
 ## Are stock returns distributed normally?
 
-**Visual Arguments**
+.panelset[
+.panel[
+.panel-name[**Visual Arguments**]
 
-  * We can use `ggplot` to visualise the empirical distribution, superimposing what the returns would look like if they were normally distributed.
+* We can use `ggplot` to visualise the empirical distribution, superimposing what the returns would look like if they were normally distributed.
 
   * **Only two parameters (a mean and a variance) are required to create a hypothetical normal distribution of a returns series**
-  
-## Are stock returns distributed normally?
-
+]
+.panel[
+.panel-name[ggplot code]
 ```{r,eval=FALSE, echo=TRUE}
 glen_m %>% 
   ggplot(aes(x=log_return)) +
@@ -472,19 +554,39 @@ glen_m %>%
               sd=sd(glen_m$log_return)),
     col="red")
 ```
+]
+.panel[
+.panel-name[output]
+```{r,eval=T, echo=F, fig.height=2}
+glen_m %>% 
+  ggplot(aes(x=log_return)) +
+  geom_density() +
+  stat_function(
+    fun=dnorm,
+    args=list(mean(glen_m$log_return),
+              sd=sd(glen_m$log_return)),
+    col="red")
+```
+]
+.panel[
+.panel-name[Inference]
 
+* **What patterns are revealed?**
+* The normal distribution is superimposed over the histogram of the daily equity returns.
+* Compared to the normal the distribution of the returns has longer tails and a higher central peak.
+* In statistical terms we say the distribution is leptokurtic, or fat-tailed.
+]
+]
 
-## Inference
-
-  * **What patterns are revealed?**
-
-  * The normal distribution is superimposed over the histogram of the daily equity returns.
-  * Compared to the normal the distribution of the returns has longer tails and a higher central peak.
-  * In statistical terms we say the distribution is leptokurtic, or fat-tailed.
+---
+class: middle
 
 ## Are stock returns distributed normally?
-  
-```{r qqplot,echo=FALSE}
+.panelset[
+.panel[
+.panel-name[Quantile-quantile plot]
+.pull-left[
+```{r qqplot,echo=T,eval=F}
 tsfe::glen_m %>%
   ggplot(aes(sample=100*log_return)) +
   stat_qq(distribution = stats::qnorm) +
@@ -492,102 +594,84 @@ tsfe::glen_m %>%
                colour="red") +
   labs(title = "Quantile-quantile plot of glencore stock returns")
 ```
-
-## Inference
-
+]
+.pull-right[
+```{r qqplot1,echo=FALSE,eval=T}
+glen_m %>%
+  ggplot(aes(sample=100*log_return)) +
+  stat_qq(distribution = stats::qnorm) +
+  stat_qq_line(distribution = stats::qnorm,
+               colour="red") +
+  labs(title = "Quantile-quantile plot of glencore stock returns")
+```
+]
+]
+.panel[
+.panel-name[Inference]
 * This plot compares the quantiles of a normal distribution (thinner straight line) to the quantiles of the data (thicker scatter plot).
 * If the plots exactly overlap then the data is probably normally distributed.
 * While the returns and the normal distribution are similar between +12.5% and -12.5%, outside these limits the returns behave non-normally.
+]
+]
 
+---
+class: middle
 
-## Are stock returns distributed normally?
+### Should we care if asset returns are normal distributed variables?
 
-  **Statistical Evidence**
-
-* Use `table.Stats` from the `tidyquant` package to obtain some summary statistics of the returns.
-* Note that a normally distributed series would have the following properties:  
-* zero mean, constant variance, zero skewness, and excess kurtosis of four.
-
-
-## Are stock returns distributed normally ?
-
-\fontsize{8}{14}\sf
-
-```{r basic_stats, echo=FALSE, warning=FALSE}
-t<-table.Stats(glen_m$log_return)
-t1<-t[c("Observations","NAs","Arithmetic Mean","Skewness","Kurtosis"),]
-kable(t1, align = 'c', caption = " Selected summary statistics for monthly Glencore log returns (2016-2020)",booktabs=TRUE)  %>%
-  kable_styling(bootstrap_options =c("striped"),latex_options=c("HOLD_position"))
-  
-```
-
-## Why care about the normal distributed variables?
-
-\fontsize{12}{14}\sf
-
+.large[
 - In regressions the assumption of normality of model errors is one of the least important
 - For the purpose of estimating the regression line it is barely important at all
 - Diagnostics of normality of errors is not recommended unless the model is being used to predict individual data points.
+]
 
-## Why care about the normal distributed variables?
 
-\fontsize{8}{14}\sf
+---
+class: middle
+
+### Should we care if asset returns are normal distributed variables?
+
+
 - If the distribution of errors is of interest, perhaps because of predictive goals, this should be distinguished from the distribution of the data, $y$.
 - **A regression model does not assume or require that predictors are normally distributed**
 - Furthermore, the normal distribution on the outcome refers to the regression errors, not the raw data.
 - Depending on the structure of the predictors, it is possible for data $y$ to be far from normally distributed even when coming from a linear regression model.
 - See Gelman et al., (2020) Chapter 11 for more detail
 
-## Null hypothesis significant testing
+---
+class: middle
 
-\fontsize{12}{14}\sf
+## Null (.acid[ or Nil]) hypothesis significant testing
+
 
 * Null hypothesis significance tests (NHST) are models.
 * We assume an underlying data story with distributional properties which then allows us to create p-values based on null hypothesis.
 * In practice they are often misused to create 'bright line' acceptance or rejection decision about underlying theoretical questions.
 * In applied statistics their misuse is well understood
 
- 
+.blockquote[
+Read
+Bailey, D. H. & Prado, M. L. de. Finance is Not Excused: Why Finance Should Not Flout Basic Principles of Statistics. Ssrn Electron J (2021) doi:10.2139/ssrn.3895330.
+]  
+
+
+---
+class: middle
 
 ## Are stock returns distributed normally?
 
-### Simple hypothesis tests of log returns
-
-\fontsize{8}{14}\sf
-
-$$H_0:\mu=0$$
-
-* In `R` we can use a simple `t.test`
-
-
-```{r returns_ttest,echo=T}
-t.test(glen_m$log_return)
-```
-
-## Are stock returns distributed normally?
-
-\fontsize{8}{14}\sf
-
-### Normality test
-**Statistical Evidence**
-
-* In `R` we can use `jarque.test` in the `moments` package which is a joint test of the null hypothesis that skewness=0 and kurtosis=3
-
-```{r returns_normality_test ,echo=T}
-moments::jarque.test(glen_m$log_return)
-```
-
-## Are stock returns distributed normally?
-
-  **Statistical inference**
+.acid[Statistical inference]
   
-  * Assuming the models underpinning the previous NHST are valid, we can reject the Null that Glencore monthly log returns are normally distributed at even the 1% significance level.
+* Assuming the models underpinning the previous NHST are valid, we can reject the Null that Glencore monthly log returns are normally distributed at even the 1% significance level.
 
-  **Practical inference**
+.acid[Practical inference]
   
-  * Assuming normality to model the *middle* of the data is probably ok
-  * Modelly extreme observations may need more distributional tools.
+* Assuming normality to model the *middle* of the data is probably ok
+* Modelly extreme observations may need more distributional tools.
 
+
+---
+class: middle
 
 ## Heavy Tail Statistical Distributions 
 
@@ -601,81 +685,83 @@ Scale mixture
   : a combination of a number of normals.
 
 
-# Time plots
+---
+class: middle
 
 ## Rethinking time plots
-
+.pull-left[
 * One **limitation** with time plots is that the simple passage of time is not a good explanatory variable.
 * There are occasional exceptions where there is a clear mechanism driving the financial time series.
 
-\bigskip
+.blockquote[Descriptive chronology is not causal explanation - Edward Tufte ( 2015) *The visual display of quantitative information* P37
+]
+]
 
-* **Descriptive chronology is not causal explanation** - Edward Tufte ( 2015) *The visual display of quantitative information* P37
-
-## Time plots
-
-\small
-
-```{r, echo=TRUE, fig.height=4}
-glen_m %>%ggplot(aes(x=date,y=log_return)) + 
+.pull-right[
+```{r, echo=TRUE, fig.height=3}
+glen_m %>% ggplot(aes(x=date,y=log_return)) + 
   geom_line()
 ```
 
-## Are time plots best?
+]
 
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{glen_weekly_seasons.png}
-
-<!-- \includegraphics{glen_weekly_seasons.png} -->
-
-# Seasonal plots
+---
+class: middle
 
 ## Seasonal plots
-
-\small 
-
+.panelset[
+.panel[
+.panel-name[Code]
 ```{r,echo=T, eval=F}
 glen_m_ts %>% ggseasonplot(year.labels=TRUE,
                            year.labels.left=TRUE) + 
   ylab("") +
   ggtitle("Seasonal plot: Glencore returns")
 ```
+]
+.panel[
+.panel-name[Output]
 
-## Seasonal plots
+```{r,echo=F, eval=T, fig.height=2}
+glen_m_ts %>% ggseasonplot(year.labels=TRUE,
+                           year.labels.left=TRUE) + 
+  ylab("") +
+  ggtitle("Seasonal plot: Glencore returns")
+```
+]
+.panel[
+.panel-name[Inference]
 
-\includegraphics{glen_season1.png}
-
-## Seasonal plots
-
-  * Data plotted against the individual "seasons" in which the data were observed.  (In this case a "season" is a month.)
+.discussion[
+* Data plotted against the individual "seasons" in which the data were observed.  (In this case a "season" is a month.)
   * Something like a time plot except that the data from each season are overlapped.
   * Enables the underlying seasonal pattern to be seen more clearly, and also allows any substantial departures from the seasonal pattern to be easily identified.
   * In R: `ggseasonplot()`
+]
+]
+.panel[
+.panel-name[Polar plot]
 
-## Seasonal polar plots
-
-\small
-
-```{r,echo=T,out.height="60%", fig.align="center"}
+```{r,echo=T, fig.height=2, fig.align="center"}
 glen_m_ts %>% ggseasonplot(polar=TRUE) + ylab("")
 ```
 
-<!-- \includegraphics{glen_season2.png} -->
-
-## Seasonal subseries plots
-
-\small
-
-```{r,echo=T,out.height="60%", fig.align="center"}
+]
+.panel[
+.panel-name[ Subseries plots]
+```{r,echo=T, fig.height=2, fig.align="center"}
 ggsubseriesplot(glen_m_ts) + ylab("") +
   ggtitle("Subseries plot: Glencore returns")
 ```
-<!-- \includegraphics{glen_season3.png} -->
-
-## Seasonal subseries plots
 
   * Data for each season collected together in time plot as separate time series.
   * Enables the underlying seasonal pattern to be seen clearly, and changes in seasonality over time to be visualized.
   * In R: `ggsubseriesplot()`
+]
+]
+
+---
+class: middle
 
 # Seasonal or cyclic?
 
@@ -688,8 +774,10 @@ Seasonal
   : pattern exists when a series is influenced by seasonal factors (e.g., the quarter of the year, the month, or day of the week).
 
 Cyclic
-  : pattern exists when data exhibit rises and falls that are \emph{not of fixed period} (duration usually of at least 2 years).
+  : pattern exists when data exhibit rises and falls that are **not of fixed period** (duration usually of at least 2 years).
 
+---
+class: middle
 ## Time series components
 
 ### Differences between seasonal and cyclic patterns:
@@ -698,107 +786,134 @@ Cyclic
 * average length of cycle longer than length of seasonal pattern
 * magnitude of cycle more variable than magnitude of seasonal pattern
 
+---
+class: middle
+
 ## Time series patterns
 
-\small
 
-```{r NI house sales}
+```{r NI house sales, fig.height=2}
+ts(tsfe::ni_hsales$`Total Verified Sales`,start = c(2005,1),frequency = 4)->ni_hsales_ts
 autoplot(ni_hsales_ts) +
   ggtitle("Northern Ireland Quarter House Sales") +
   xlab("Year") + ylab("Total Verified Sales")
 ```
 
+---
+class: middle
+
 ## Time series patterns
 
-\small
 
-```{r eps}
+```{r eps,fig.height=2}
 autoplot(carnival_eps_ts) +
   ggtitle("Quarterly EPS for Carnival Plc") +
   xlab("Year") + ylab("")
 ```
 
+---
+class: middle
+
 ## Time series patterns
 
-```{r}
-ustb %>%
-  filter(date>=date("2010-01-01")) %>%
-  ggplot(aes(x=date,y=x4.wk.bank.discount.rate)) +
+```{r fig.height=2}
+tsfe::usuk_rate %>%
+  ggplot(aes(x=date,y=price)) +
   geom_line(colour="darkgreen") +
-  labs(title=" Time Plot of 1 month Treasury Bill Rate",
+  labs(title=" Time Plot of GBP:USD",
        x="",
-       y="%")
+       y="Value of £1 in Dollars")
 ```
+
+---
+class: middle
 
 ## Seasonal or cyclic?
 
-\alert{Differences between seasonal and cyclic patterns:}
+.fat[Differences between seasonal and cyclic patterns]
 
-\bigskip
+.large[
+* seasonal pattern constant length; cyclic pattern variable length
+* average length of cycle longer than length of seasonal pattern
+* magnitude of cycle more variable than magnitude of seasonal pattern
+]
 
-  * seasonal pattern constant length; cyclic pattern variable length
-  * average length of cycle longer than length of seasonal pattern
-  * magnitude of cycle more variable than magnitude of seasonal pattern
-
-\pause
-
-\begin{alertblock}{}
+.blockquote[
 The timing of peaks and troughs is predictable with seasonal data, but unpredictable in the long term with cyclic data.
-\end{alertblock}
+]
+
+---
+class: middle
 
 # Lag plots and autocorrelation
 
-## Example: Earnings per share
+.pull-left[
+### Example: Earnings per share
 
-```{r, echo=TRUE, fig.height=6, fig.width=6, out.width="10cm",fig.align="center"}
-gglagplot(carnival_eps_ts)
+```{r, echo=TRUE,out.width="10cm",fig.align="center"}
+gglagplot(tsfe::carnival_eps_ts)
 ```
+]
+.pull-right[
+### Lagged scatterplots
 
-## Lagged scatterplots
-
-  * Each graph shows $y_t$ plotted against $y_{t-k}$ for
+* Each plot shows $y_t$ plotted against $y_{t-k}$ for
 different values of $k$.
-  * The autocorrelations are the correlations associated
+* The autocorrelations are the correlations associated
 with these scatterplots.
+]
+
+---
+class: middle
 
 ## Autocorrelation
 
-**Covariance** and **correlation**: measure extent of **linear relationship** between two variables ($y$ and $X$).\pause
+- One of the most important data properties that financial time series models exploits
 
-**Autocovariance** and **autocorrelation**: measure linear relationship between **lagged values** of a time series $y$.\pause
+- **Covariance** and **correlation**: measure extent of **linear relationship** between two variables ($y$ and $X$).
 
-We measure the relationship between:
+--
 
-  * $y_{t}$ and $y_{t-1}$
-  * $y_{t}$ and $y_{t-2}$
-  * $y_{t}$ and $y_{t-3}$
-  * etc.
+- **Autocovariance** and **autocorrelation**: measure linear relationship between **lagged values** of a time series $y$.
+
+--
+
+-.acidinline[We measure the relationship between:]
+
+* $y_{t}$ and $y_{t-1}$
+* $y_{t}$ and $y_{t-2}$
+* $y_{t}$ and $y_{t-3}$
+* etc.
+
+---
+class: middle
 
 ## Autocorrelation
 
 We denote the sample autocovariance at lag $k$ by $c_k$ and the sample autocorrelation at lag $k$ by $r_k$.  Then define
 
-\begin{block}{}
-\begin{align*}
-c_k &= \frac{1}{T}\sum_{t=k+1}^T (y_t-\bar{y})(y_{t-k}-\bar{y}) \\[0.cm]
-\text{and}\qquad
-r_{k} &= c_k/c_0
-\end{align*}
-\end{block}\pause\small
+$$c_k = \frac{1}{T}\sum_{t=k+1}^T (y_t-\bar{y})(y_{t-k}-\bar{y})$$ 
 
-  * $r_1$ indicates how successive values of  $y$  relate to each other
-  * $r_2$ indicates how  $y$ values two periods apart relate to each other
-  * $r_k$ is \textit{almost} the same as the sample correlation between $y_t$ and $y_{t-k}$.
+.salt[and]
+
+$$r_{k} = c_k/c_0$$
+
+* $r_1$ indicates how successive values of  $y$  relate to each other
+* $r_2$ indicates how  $y$ values two periods apart relate to each other
+* $r_k$ is *almost* the same as the sample correlation between $y_t$ and $y_{t-k}$.
+
+
+---
+class: middle
 
 ## Autocorrelation
 
-\small
+
 Results for first 9 lags for Carnival earnings data:
 
-\footnotesize
 
 ```{r, echo=FALSE}
-epsacf <- matrix(acf(c(carnival_eps_ts), lag.max=9,
+epsacf <- matrix(acf(c(tsfe::carnival_eps_ts), lag.max=9,
                       plot=FALSE)$acf[-1,,1], nrow=1)
 colnames(epsacf) <- paste("$r_",1:9,"$",sep="")
 knitr::kable(epsacf, booktabs=TRUE,
@@ -806,135 +921,98 @@ knitr::kable(epsacf, booktabs=TRUE,
              format.args=list(nsmall=3))
 ```
 
-```{r epsacf, fig.height=2.5}
-ggAcf(carnival_eps_ts)
+```{r epsacf, fig.height=1}
+ggAcf(tsfe::carnival_eps_ts)
 ```
+
+
+---
+class: middle
 
 ## Autocorrelation
 
-  * $r_{4}$  higher than for the other lags. This is due to **the seasonal pattern in the data**: the peaks tend to be **4 quarters** apart and the troughs tend to be **2 quarters** apart.
-  * $r_2$ is more negative than for the other lags because troughs tend to be 2 quarters behind peaks.
-  * Together, the autocorrelations at lags 1, 2, \dots, make up the \emph{autocorrelation} or ACF.
-  * The plot is known as a **correlogram**
+.pull-left[
+* $r_{4}$  higher than for the other lags. This is due to **the seasonal pattern in the data**: the peaks tend to be **4 quarters** apart and the troughs tend to be **2 quarters** apart.
+* $r_2$ is more negative than for the other lags because troughs tend to be 2 quarters behind peaks.
+* Together, the autocorrelations at lags 1, 2, $\dots$, make up the **autocorrelation** or ACF.
+* The plot is known as a **correlogram**
+]
+.pull-right[
 
-## ACF
+#### ACF
 
 ```{r, fig.height=4, echo=TRUE}
 ggAcf(carnival_eps_ts)
 ```
+]
 
-## Trend and seasonality in ACF plots
+---
+class: middle
 
+### ACF plots
+
+.panelset[
+.panel[
+.panel-name[Trend and seasonality]
 - When data have a trend, the autocorrelations for small lags tend to be large and positive.
 - When data are seasonal, the autocorrelations will be larger at the seasonal lags (i.e., at multiples of the seasonal frequency)
 - When data are trended and seasonal, you see a combination of these effects.
+]
+.panel[
+.panel-name[Any trends?]
 
-## Carnival quarterly earnings
-
-```{r}
+```{r, fig.height=2}
 autoplot(carnival_eps_ts)
 ```
+]
+.panel[
+.panel-name[Any autcorrelation?]
 
-## Carnival quarterly earnings
-
-```{r}
+```{r,fig.height=2}
 ggAcf(carnival_eps_ts)
 ```
-
-## Carnival quarterly earnings
-
+]
+.panel[
+.panel-name[]
+.discussion[
 Time plot shows clear trend and seasonality.
 
 The same features are reflected in the ACF.
 
   * The slowly decaying ACF indicates trend.
   * The ACF peaks at lags 4, 8, 12, 16, 20, \dots, indicate seasonality of length 4.
+]
+]
+]
 
-## Glencore daily stock price
+---
+class: middle
 
-```{r}
-glen <- tq_get("GLEN.L")
-glen_ts<-ts(glen$adjusted,freq=1)
-```
+.your-turn[
+
+* use `tq_get()` to download GLEN.L stock price from yahoo finance
+* using this series create a time series object hint **use frequency=1**
+* Explore this time series for trends and autocorrelation
+]
 
 
+---
+class: middle
 
-```{r}
-autoplot(glen_ts)
-```
+# Signal and the noise
 
-## Glencore daily stock price
+.heat[
+- On important stylised fact of financial time series data is a low $\frac{Signal}{Noise}$ ratio, which changes over time (is dynamic).
+- The signal is the *sense* you want your model to capture and predict, the noise is the *nonsense* you do not want your model to capture as it is unpredictable.
+]
 
-```{r}
-ggAcf(glen_ts, lag.max=100)
-```
+.blockquote[
+Noise makes trading in financial markets possible, and thus allows us to observe prices in financial assets. [But] noise also causes markets to be somewhat inefficient…. . Most generally, noise makes it very difficult to test either practical or academic theories about the way that financial or economic markets work. We are forced to act largely in the dark
+`r tufte::quote_footer("Fisher Black, Noise, Journal of Finance ,41 ,3 (1986) (p.529)")`
+]
 
-## Your turn
-
-We have introduced the following graphics functions:
-
-  - `gglagplot`
-  - `ggAcf`
-
-Explore the following time series using these functions. Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
-
-  - `ni_hsales_ts`
-  - `vix_ts`
-  - `ftse_m_ts`
-
-## Which is which?
-
-```{r, fig.height=6, fig.width=12, echo=FALSE, warning=FALSE, out.width="11.5cm"}
-tp1 <- autoplot(ni_hsales_ts) + xlab("") + ylab("Total Verified Sales") +
-  ggtitle("1. NI house sales")
-tp2 <- autoplot(vix_ts) + xlab("") + ylab("") +
-  ggtitle("2. VIX prices")
-tp3 <- autoplot(ftse_m_ts) + xlab("") + ylab("") +
-  ggtitle("3. FTSE 100 log returns")
-acfa <- ggAcf(ni_hsales_ts, ci=0) + xlab("") + ggtitle("A") + ylim(-0.4,1)
-acfb <- ggAcf(vix_ts, ci=0) + xlab("") + ggtitle("B") + ylim(-0.4,1)
-acfc <- ggAcf(ftse_m_ts, ci=0) + xlab("") + ggtitle("C") + ylim(-0.4,1)
-gridExtra::grid.arrange(tp1,tp2,tp3,
-                        acfc,acfb,acfa,nrow=2)
-```
-
-## Your turn
-  - load `fin7028_dat.RData` from canvas
-
-We have introduced the following graphics functions:
-
-  - `gglagplot`
-  - `ggAcf`
-
-Explore the following time series using these functions. Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
-
-  - `ni_hsales_ts`
-  - `vix_ts`
-  - `ftse_ts`
-
-## Which is which?
-
-```{r, fig.height=6, fig.width=12, echo=FALSE, warning=FALSE, out.width="11.5cm"}
-tp1 <- autoplot(ni_hsales_ts) + xlab("") + ylab("Total Verified Sales") +
-  ggtitle("1. NI house sales")
-tp2 <- autoplot(vix_ts) + xlab("") + ylab("") +
-  ggtitle("2. VIX prices")
-tp3 <- autoplot(ftse_m_ts) + xlab("") + ylab("") +
-  ggtitle("3. FTSE 100 log returns")
-acfa <- ggAcf(ni_hsales_ts, ci=0) + xlab("") + ggtitle("A") + ylim(-0.4,1)
-acfb <- ggAcf(vix_ts, ci=0) + xlab("") + ggtitle("B") + ylim(-0.4,1)
-acfc <- ggAcf(ftse_m_ts, ci=0) + xlab("") + ggtitle("C") + ylim(-0.4,1)
-gridExtra::grid.arrange(tp1,tp2,tp3,
-                        acfc,acfb,acfa,nrow=2)
-```
-
-## Which is which?
-
-1. NI house sales is A ACF plot
-2. VIX prices is B ACF plot
-3. FTSE 100 log returns is C ACF plot
-
-# White noise
+---
+class: middle
 
 ## Example: White noise
 
@@ -942,6 +1020,10 @@ gridExtra::grid.arrange(tp1,tp2,tp3,
 wn <- ts(rnorm(36))
 autoplot(wn)
 ```
+
+
+---
+class: middle
 
 ## Example: White noise
 
@@ -959,75 +1041,35 @@ print(xtable::xtable(t(wnacf)),
     floating=FALSE)
 ```
 
-\centerline\textbf{Sample autocorrelations for white noise series.}
+- Sample autocorrelations for white noise series
 
-We expect each autocorrelation to be close to zero.
+- We expect each autocorrelation to be close to zero.
+
+---
+class: middle
 
 ## Sampling distribution of autocorrelations
 
-Sampling distribution of $r_k$ for white noise data is asymptotically N(0,$1/T$).\pause
+Sampling distribution of $r_k$ for white noise data is asymptotically N(0,$1/T$).
 
-  *  95% of all $r_k$ for white noise must lie within $\pm 1.96/\sqrt{T}$.
-  * If this is not the case, the series is probably not WN.
-  * Common to plot lines at $\pm 1.96/\sqrt{T}$ when plotting ACF.
-These are the \textcolor{orange}{\textbf{\emph{critical values}}}.
+* 95% of all $r_k$ for white noise must lie within $\pm 1.96/\sqrt{T}$.
+* If this is not the case, the series is probably not WN.
+* Common to plot lines at $\pm 1.96/\sqrt{T}$ when plotting ACF.
 
-## Autocorrelation
+---
+class: middle
 
-\placefig{5}{1.6}{width=8cm}{wnacf}
-
-\begin{textblock}{4.8}(0.2,1.5)
-\structure{Example:}
-
-$T=36$ and so critical values at $\pm
-1.96/\sqrt{36} = \pm 0.327$.
-
-All autocorrelation coefficients lie within these
-limits, confirming  that the data are white noise. (More precisely, the data cannot be \\
-distinguished \rlap{from white noise.)}
-\end{textblock}
-
-## Example: US Investor Sentiment
-
-\small
-
-\includegraphics{sentiment.png}
-
-## Example: US Investor Sentiment
-
-```{r}
-ggAcf(sentiment_ts)
-```
-
-## Example: US Investor Sentiment
-
-\small
-
-The AAII Sentiment Survey measures the percentage of individuals who are bullish, bearish, and neutral about the stock market over the next six months.
-(https://www.aaii.com/journal/sentimentsurveyarticle.)
-
-  * Difficult to detect pattern in time plot.
-  * ACF shows some significant autocorrelation on all 30 lags.
-  * After $r_{15}$ there seems to be a undulating pattern.
-  * These show the series is **not a white noise series**.
-
-## Your turn
+.your-turn[
 
 You can compute the daily changes in the Google stock price using
 ```r
 dgoog <- diff(goog)
 ```
 Does `dgoog` look like white noise?
+]
 
-# Noise in Financial Data
-
-## Fisher Black, “Noise”, Journal of Finance ,41 ,3 (1986):
-
-\hfill
-
-\begin{displayquote}
-Noise makes trading in financial markets possible, and thus allows us to observe prices in financial assets. [But] noise also causes markets to be somewhat inefficient…. . Most generally, noise makes it very difficult to test either practical or academic theories about the way that financial or economic markets work. We are forced to act largely in the dark-(p.529)
-\end{displayquote} 
+---
+class:
 
 ## Financial Data Forecastability
 
@@ -1036,23 +1078,26 @@ Noise makes trading in financial markets possible, and thus allows us to observe
   2. How much data are available
   3. Whether the forecast can affect the thing we are trying to forecast
 
-<!-- ## Prediction and EMH -->
-<!--   - Crudely, the efficent market hypothesis (EMH) implies that returns from speculative assets are *unforecastable* -->
-<!--   - The overpowering logic of the EMH is: -->
-<!--     - **If returns are forecastable,there should exist a money machine producing unlimited wealth** -->
-<!-- - Based on the random walk theory change in price are defined as white noise as follows: -->
-<!-- \begin{align*} -->
-<!-- p_t=p_{t-1} + a_t \\ -->
-<!-- p_t-p_{t-1} = a_t \\ -->
-<!-- \text{where} -->
-<!-- \end{align*} -->
+## Prediction and EMH
+  - Crudely, the efficent market hypothesis (EMH) implies that returns from speculative assets are *unforecastable*
+  - The overpowering logic of the EMH is:
+    - **If returns are forecastable,there should exist a money machine producing unlimited wealth**
+- Based on the random walk theory change in price are defined as white noise as follows:
+\begin{align*}
+p_t=p_{t-1} + a_t \\
+p_t-p_{t-1} = a_t \\
+\text{where}
+\end{align*}
 
 
+---
+class: middle
 
-## Signal and the Noise
+.salt[
 
   - High quality models identify the signal from the noise in financial data.
   - The **signal** is the regular pattern that is likely to repeat.
   - The **noise** is the irregular pattern which occurrs by chance and unlikely to repeat.
   - Overfitting or data snooping can result in your model capturing both **signal** and **noise**.
   - Overfitted models usually produce poor predictions and inferences.
+]
